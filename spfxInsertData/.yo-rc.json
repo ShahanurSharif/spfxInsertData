@@ -1,0 +1,21 @@
+{
+  "@microsoft/generator-sharepoint": {
+    "whichFolder": "subdir",
+    "solutionName": "spfxInsertData",
+    "environment": "spo",
+    "packageManager": "npm",
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "componentType": "webpart",
+    "template": "react",
+    "componentName": "InsertDataWebPart",
+    "plusBeta": false,
+    "isCreatingSolution": true,
+    "nodeVersion": "22.15.0",
+    "sdksVersions": {},
+    "version": "1.21.1",
+    "libraryName": "spfx-insert-data",
+    "libraryId": "b8b7e887-9711-4d8b-b524-667d0516cdf3",
+    "solutionShortDescription": "spfxInsertData description"
+  }
+}

@@ -1,0 +1,22 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "shell",
+			"label": "Build SPFx Project",
+			"command": "gulp build",
+			"group": "build",
+			"problemMatcher": [
+				"$tsc"
+			]
+		},
+		{
+			"label": "Serve SPFx Workbench",
+			"type": "shell",
+			"command": "gulp serve",
+			"group": "test",
+			"isBackground": true,
+			"problemMatcher": []
+		}
+	]
+}

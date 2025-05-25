@@ -1,0 +1,40 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "spfx-insert-data-client-side-solution",
+    "id": "b8b7e887-9711-4d8b-b524-667d0516cdf3",
+    "version": "1.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false,
+    "developer": {
+      "name": "",
+      "websiteUrl": "",
+      "privacyUrl": "",
+      "termsOfUseUrl": "",
+      "mpnId": "Undefined-1.21.1"
+    },
+    "metadata": {
+      "shortDescription": {
+        "default": "spfxInsertData description"
+      },
+      "longDescription": {
+        "default": "spfxInsertData description"
+      },
+      "screenshotPaths": [],
+      "videoUrl": "",
+      "categories": []
+    },
+    "features": [
+      {
+        "title": "spfx-insert-data Feature",
+        "description": "The feature that activates elements of the spfx-insert-data solution.",
+        "id": "6e038465-86f1-420c-a175-841c6ef2b028",
+        "version": "1.0.0.0"
+      }
+    ]
+  },
+  "paths": {
+    "zippedPackage": "solution/spfx-insert-data.sppkg"
+  }
+}
