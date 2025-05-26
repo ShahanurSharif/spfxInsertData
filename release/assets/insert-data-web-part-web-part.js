@@ -15,14 +15,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ 5959);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _fluentui_react__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! @fluentui/react */ 9425);
-/* harmony import */ var _fluentui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @fluentui/react */ 827);
-/* harmony import */ var _fluentui_react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @fluentui/react */ 6643);
-/* harmony import */ var _fluentui_react__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @fluentui/react */ 7102);
-/* harmony import */ var _fluentui_react__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! @fluentui/react */ 2042);
-/* harmony import */ var _fluentui_react__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! @fluentui/react */ 4533);
+/* harmony import */ var _fluentui_react__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! @fluentui/react */ 7102);
+/* harmony import */ var _fluentui_react__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! @fluentui/react */ 2042);
 /* harmony import */ var _fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! @fluentui/react/lib/Dialog */ 4312);
 /* harmony import */ var _fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! @fluentui/react/lib/Dialog */ 548);
-/* harmony import */ var _fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! @fluentui/react/lib/Dialog */ 7295);
+/* harmony import */ var _fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! @fluentui/react/lib/Dialog */ 7295);
 /* harmony import */ var _pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @pnp/sp-commonjs */ 3346);
 /* harmony import */ var _pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(_pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _pnp_sp_webs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @pnp/sp/webs */ 7339);
@@ -79,17 +76,18 @@ var InsertDataWebPart = function (props) {
     var _d = react__WEBPACK_IMPORTED_MODULE_0__.useState([]), options = _d[0], setOptions = _d[1];
     // This shows a happy message when you add something
     var _e = react__WEBPACK_IMPORTED_MODULE_0__.useState(null), successMessage = _e[0], setSuccessMessage = _e[1];
+    var _f = react__WEBPACK_IMPORTED_MODULE_0__.useState(null), errorMessage = _f[0], setErrorMessage = _f[1];
     // These keep track of mistakes in the form
-    var _f = react__WEBPACK_IMPORTED_MODULE_0__.useState(), titleError = _f[0], setTitleError = _f[1];
-    var _g = react__WEBPACK_IMPORTED_MODULE_0__.useState(), bodyError = _g[0], setBodyError = _g[1];
-    var _h = react__WEBPACK_IMPORTED_MODULE_0__.useState(), letterError = _h[0], setLetterError = _h[1];
-    var _j = react__WEBPACK_IMPORTED_MODULE_0__.useState(true), disabled = _j[0], setDisabled = _j[1];
-    var _k = react__WEBPACK_IMPORTED_MODULE_0__.useState(false), showForm = _k[0], setShowForm = _k[1];
+    var _g = react__WEBPACK_IMPORTED_MODULE_0__.useState(), titleError = _g[0], setTitleError = _g[1];
+    var _h = react__WEBPACK_IMPORTED_MODULE_0__.useState(), bodyError = _h[0], setBodyError = _h[1];
+    var _j = react__WEBPACK_IMPORTED_MODULE_0__.useState(), letterError = _j[0], setLetterError = _j[1];
+    var _k = react__WEBPACK_IMPORTED_MODULE_0__.useState(true), disabled = _k[0], setDisabled = _k[1];
+    var _l = react__WEBPACK_IMPORTED_MODULE_0__.useState(false), showForm = _l[0], setShowForm = _l[1];
     // FAQ list state
-    var _l = react__WEBPACK_IMPORTED_MODULE_0__.useState([]), faqItems = _l[0], setFaqItems = _l[1];
-    var _m = react__WEBPACK_IMPORTED_MODULE_0__.useState(null), editingItem = _m[0], setEditingItem = _m[1];
-    var _o = react__WEBPACK_IMPORTED_MODULE_0__.useState(null), deletingItem = _o[0], setDeletingItem = _o[1];
-    var _p = react__WEBPACK_IMPORTED_MODULE_0__.useState(false), showDeleteDialog = _p[0], setShowDeleteDialog = _p[1];
+    var _m = react__WEBPACK_IMPORTED_MODULE_0__.useState([]), faqItems = _m[0], setFaqItems = _m[1];
+    var _o = react__WEBPACK_IMPORTED_MODULE_0__.useState(null), editingItem = _o[0], setEditingItem = _o[1];
+    var _p = react__WEBPACK_IMPORTED_MODULE_0__.useState(null), deletingItem = _p[0], setDeletingItem = _p[1];
+    var _q = react__WEBPACK_IMPORTED_MODULE_0__.useState(false), showDeleteDialog = _q[0], setShowDeleteDialog = _q[1];
     var validateTitle = function (value) {
         if (!value || value.trim() === '') {
             setTitleError('Title is required');
@@ -209,7 +207,8 @@ var InsertDataWebPart = function (props) {
                 case 2:
                     // Update existing item
                     _a.sent();
-                    setSuccessMessage('FAQ item updated successfully!');
+                    setSuccessMessage('Item updated successfully');
+                    setErrorMessage(null);
                     return [3 /*break*/, 5];
                 case 3: 
                 // Add new item
@@ -221,19 +220,23 @@ var InsertDataWebPart = function (props) {
                 case 4:
                     // Add new item
                     _a.sent();
-                    setSuccessMessage('FAQ item added successfully!');
+                    setSuccessMessage('Item created successfully');
+                    setErrorMessage(null);
                     _a.label = 5;
                 case 5:
                     setTitle('');
                     setBody('');
                     setLetter('');
                     setEditingItem(null);
-                    setTimeout(function () { return setSuccessMessage(null); }, 5000);
-                    setShowForm(false);
+                    setTimeout(function () {
+                        setSuccessMessage(null);
+                        setShowForm(false);
+                    }, 5000);
                     return [3 /*break*/, 7];
                 case 6:
                     error_1 = _a.sent();
-                    alert('Error saving FAQ item: ' + error_1);
+                    setErrorMessage('Error creating item');
+                    setSuccessMessage(null);
                     return [3 /*break*/, 7];
                 case 7: return [2 /*return*/];
             }
@@ -254,25 +257,25 @@ var InsertDataWebPart = function (props) {
     };
     // Confirm delete
     var confirmDelete = function () { return __awaiter(void 0, void 0, void 0, function () {
-        var error_2;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var _a;
+        return __generator(this, function (_b) {
+            switch (_b.label) {
                 case 0:
                     if (!deletingItem)
                         return [2 /*return*/];
-                    _a.label = 1;
+                    _b.label = 1;
                 case 1:
-                    _a.trys.push([1, 3, , 4]);
+                    _b.trys.push([1, 3, , 4]);
                     return [4 /*yield*/, _pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1__.sp.web.lists.getByTitle('FAQ').items.getById(deletingItem.Id).delete()];
                 case 2:
-                    _a.sent();
-                    setSuccessMessage('FAQ item deleted successfully!');
+                    _b.sent();
+                    setSuccessMessage('Item deleted successfully');
                     setDeletingItem(null);
                     setShowDeleteDialog(false);
                     return [3 /*break*/, 4];
                 case 3:
-                    error_2 = _a.sent();
-                    alert('Error deleting FAQ item: ' + error_2);
+                    _a = _b.sent();
+                    setErrorMessage('Error deleting item');
                     setShowDeleteDialog(false);
                     return [3 /*break*/, 4];
                 case 4: return [2 /*return*/];
@@ -301,29 +304,35 @@ var InsertDataWebPart = function (props) {
                 title: 'Create FAQ Item',
             }, modalProps: { isBlocking: false } },
             react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", { onSubmit: handleSubmit },
-                successMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_8__.MessageBar, { messageBarType: _fluentui_react__WEBPACK_IMPORTED_MODULE_9__.MessageBarType.success, isMultiline: false, onDismiss: function () { return setSuccessMessage(null); } }, successMessage)),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_10__.TextField, { label: 'Title', id: 'Title', value: Title, onChange: function (event, v) {
+                successMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "success-message", style: { marginBottom: 8, color: 'green' } }, successMessage)),
+                errorMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "error-message", style: { marginBottom: 8, color: 'red' } }, errorMessage)),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_8__.TextField, { label: 'Title', id: 'Title', value: Title, onChange: function (event, v) {
                         setTitle(v || '');
                         validateTitle(v);
-                    }, onBlur: function () { return validateTitle(Title); }, errorMessage: titleError, required: true }),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_10__.TextField, { label: 'Body', id: 'Body', value: Body, onChange: function (event, v) {
+                    }, onBlur: function () { return validateTitle(Title); }, required: true, "aria-describedby": titleError ? 'title-error' : undefined }),
+                titleError && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "title-error", role: "alert", "data-testid": "title-error", style: { color: 'red', minHeight: 18 } }, titleError)),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_8__.TextField, { label: 'Body', id: 'Body', value: Body, onChange: function (event, v) {
                         setBody(v || '');
                         validateBody(v);
-                    }, onBlur: function () { return validateBody(Body); }, errorMessage: bodyError, multiline: true, required: true }),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_11__.Dropdown, { label: "Letter", id: "Letter", options: options, selectedKey: Letter, onChange: function (event, option) {
+                    }, onBlur: function () { return validateBody(Body); }, multiline: true, required: true, "aria-describedby": bodyError ? 'body-error' : undefined }),
+                bodyError && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "body-error", role: "alert", "data-testid": "body-error", style: { color: 'red', minHeight: 18 } }, bodyError)),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_9__.Dropdown, { label: "Letter", id: "Letter", options: options, selectedKey: Letter, onChange: function (event, option) {
                         setLetter(option ? String(option.key) : '');
                         validateLetter(option ? String(option.key) : '');
-                    }, onBlur: function () { return validateLetter(Letter); }, errorMessage: letterError, required: true }),
+                    }, onBlur: function () { return validateLetter(Letter); }, required: true, "aria-describedby": letterError ? 'letter-error' : undefined }),
+                letterError && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "letter-error", role: "alert", "data-testid": "letter-error", style: { color: 'red', minHeight: 18 } }, letterError)),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_12__.DialogFooter, null,
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_10__.DialogFooter, null,
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: editingItem ? 'Update' : 'Submit', type: 'submit', disabled: disabled }),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: "Cancel", onClick: function () { setShowForm(false); setEditingItem(null); } })))),
+        successMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "success-message", style: { color: 'green', margin: '12px 0' } }, successMessage)),
+        errorMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "error-message", style: { color: 'red', margin: '12px 0' } }, errorMessage)),
         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_6__.Dialog, { hidden: !showDeleteDialog, onDismiss: cancelDelete, dialogContentProps: {
                 type: _fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_7__.DialogType.normal,
                 title: 'Delete FAQ Item',
                 subText: deletingItem ? "Are you sure you want to delete \"".concat(deletingItem.Title, "\"?") : ''
             }, modalProps: { isBlocking: true } },
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_12__.DialogFooter, null,
+            react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_10__.DialogFooter, null,
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: "Yes, Delete", onClick: confirmDelete }),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: "Cancel", onClick: cancelDelete }))),
         react__WEBPACK_IMPORTED_MODULE_0__.createElement("h3", null, "FAQ List"),
@@ -340,10 +349,14 @@ var InsertDataWebPart = function (props) {
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } }, item.body),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } }, item.Letter),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } },
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_13__.IconButton, { iconProps: { iconName: 'Edit', style: { color: 'green' } }, title: "Edit", ariaLabel: "Edit", onClick: function () { return handleEdit(item); } }),
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_13__.IconButton, { iconProps: { iconName: 'Delete', style: { color: 'red' } }, title: "Delete", ariaLabel: "Delete", onClick: function () { return handleDelete(item); } })))); }),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", "aria-label": "Edit", "data-testid": "edit-button-".concat(item.Id), onClick: function () { return handleEdit(item); }, style: { marginRight: 8 } },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { role: "img", "aria-label": "Edit", style: { marginRight: 4 } }, "\u270F\uFE0F"),
+                            "Edit"),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", "aria-label": "Delete", "data-testid": "delete-button-".concat(item.Id), onClick: function () { return handleDelete({ Id: item.Id, Title: item.Title }); } },
+                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { role: "img", "aria-label": "Delete", style: { marginRight: 4 } }, "\uD83D\uDDD1\uFE0F"),
+                            "Delete")))); }),
                 faqItems.length === 0 && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", null,
-                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { colSpan: 3, style: { textAlign: 'center', color: '#888' } }, "No FAQ items found.")))))));
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { colSpan: 4, style: { textAlign: 'center', color: '#888' } }, "No FAQ items found.")))))));
 };
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (InsertDataWebPart);
 
@@ -13458,461 +13471,6 @@ var getStyles = function (props) {
         ],
     };
 };
-
-
-/***/ }),
-
-/***/ 5669:
-/*!***********************************************************************************!*\
-  !*** ./node_modules/@fluentui/react/lib/components/MessageBar/MessageBar.base.js ***!
-  \***********************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   MessageBarBase: () => (/* binding */ MessageBarBase)
-/* harmony export */ });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! tslib */ 196);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ 5959);
-/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var _Utilities__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../../Utilities */ 3583);
-/* harmony import */ var _Utilities__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../../Utilities */ 7974);
-/* harmony import */ var _Utilities__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../../Utilities */ 8972);
-/* harmony import */ var _Utilities__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../../Utilities */ 2021);
-/* harmony import */ var _Button__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../../Button */ 4533);
-/* harmony import */ var _Icon__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../../Icon */ 2394);
-/* harmony import */ var _MessageBar_types__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageBar.types */ 6643);
-/* harmony import */ var _fluentui_react_hooks__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! @fluentui/react-hooks */ 4824);
-/* harmony import */ var _fluentui_react_hooks__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @fluentui/react-hooks */ 8555);
-var _a;
-
-
-
-
-
-
-
-var ICON_MAP = (_a = {},
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.info] = 'Info',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.warning] = 'Info',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.error] = 'ErrorBadge',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.blocked] = 'Blocked2',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.severeWarning] = 'Warning',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.success] = 'Completed',
-    _a);
-var COMPONENT_NAME = 'MessageBar';
-var getClassNames = (0,_Utilities__WEBPACK_IMPORTED_MODULE_2__.classNamesFunction)();
-var getAnnouncementPriority = function (messageBarType) {
-    switch (messageBarType) {
-        case _MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.blocked:
-        case _MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.error:
-        case _MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.severeWarning:
-            return 'assertive';
-    }
-    return 'polite';
-};
-var getRole = function (messageBarType) {
-    switch (messageBarType) {
-        case _MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.blocked:
-        case _MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.error:
-        case _MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.severeWarning:
-            return 'alert';
-    }
-    return 'status';
-};
-var MessageBarBase = react__WEBPACK_IMPORTED_MODULE_0__.forwardRef(function (props, ref) {
-    var _a = (0,_fluentui_react_hooks__WEBPACK_IMPORTED_MODULE_3__.useBoolean)(false), expandSingleLine = _a[0], toggleExpandSingleLine = _a[1].toggle;
-    var labelId = (0,_fluentui_react_hooks__WEBPACK_IMPORTED_MODULE_4__.useId)('MessageBar');
-    var actions = props.actions, className = props.className, children = props.children, 
-    // eslint-disable-next-line @typescript-eslint/no-deprecated
-    overflowButtonAriaLabel = props.overflowButtonAriaLabel, dismissIconProps = props.dismissIconProps, styles = props.styles, theme = props.theme, _b = props.messageBarType, messageBarType = _b === void 0 ? _MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.info : _b, _c = props.onDismiss, onDismiss = _c === void 0 ? undefined : _c, _d = props.isMultiline, isMultiline = _d === void 0 ? true : _d, truncated = props.truncated, dismissButtonAriaLabel = props.dismissButtonAriaLabel, messageBarIconProps = props.messageBarIconProps, role = props.role, _e = props.delayedRender, delayedRender = _e === void 0 ? true : _e, expandButtonProps = props.expandButtonProps, _f = props.onExpandButtonToggled, onExpandButtonToggled = _f === void 0 ? undefined : _f, showExpandButton = props.showExpandButton;
-    // Wrap 'toggleExpandSingleLine' to execute the 'onExpandButtonToggled' callback whenever the expand button toggles
-    var handleToggleExpandSingleLine = react__WEBPACK_IMPORTED_MODULE_0__.useCallback(function () {
-        toggleExpandSingleLine();
-        if (onExpandButtonToggled) {
-            // We use the opposite of 'expandSingleLine' here because at this point the useBoolean's
-            // useState hasn't been updated yet.
-            onExpandButtonToggled(!expandSingleLine);
-        }
-    }, [expandSingleLine, onExpandButtonToggled, toggleExpandSingleLine]);
-    var nativeProps = (0,_Utilities__WEBPACK_IMPORTED_MODULE_5__.getNativeProps)(props, _Utilities__WEBPACK_IMPORTED_MODULE_5__.htmlElementProperties, [
-        'className',
-        'role',
-    ]);
-    var classNames = getClassNames(styles, {
-        theme: theme,
-        messageBarType: messageBarType || _MessageBar_types__WEBPACK_IMPORTED_MODULE_1__.MessageBarType.info,
-        onDismiss: onDismiss !== undefined,
-        actions: actions !== undefined,
-        truncated: truncated,
-        isMultiline: isMultiline,
-        expandSingleLine: expandSingleLine,
-        className: className,
-    });
-    var expandIconProps = { iconName: expandSingleLine ? 'DoubleChevronUp' : 'DoubleChevronDown' };
-    var regionProps = actions || onDismiss ? { 'aria-describedby': labelId, role: 'region' } : {};
-    var actionsDiv = actions ? react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: classNames.actions }, actions) : null;
-    var dismissButton = onDismiss ? (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Button__WEBPACK_IMPORTED_MODULE_6__.IconButton, { disabled: false, className: classNames.dismissal, onClick: onDismiss, iconProps: dismissIconProps ? dismissIconProps : { iconName: 'Clear' }, title: dismissButtonAriaLabel, ariaLabel: dismissButtonAriaLabel })) : null;
-    return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__assign)({ ref: ref, className: classNames.root }, regionProps),
-        react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: classNames.content },
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: classNames.iconContainer, "aria-hidden": true }, messageBarIconProps ? (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Icon__WEBPACK_IMPORTED_MODULE_8__.Icon, (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__assign)({}, messageBarIconProps, { className: (0,_Utilities__WEBPACK_IMPORTED_MODULE_9__.css)(classNames.icon, messageBarIconProps.className) }))) : (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Icon__WEBPACK_IMPORTED_MODULE_8__.Icon, { iconName: ICON_MAP[messageBarType], className: classNames.icon }))),
-            react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: classNames.text, id: labelId, role: role || getRole(messageBarType), "aria-live": getAnnouncementPriority(messageBarType) },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__assign)({ className: classNames.innerText }, nativeProps), delayedRender ? (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Utilities__WEBPACK_IMPORTED_MODULE_10__.DelayedRender, null,
-                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", null, children))) : (
-                // this span is probably not necessary, but preserving it for now in case anyone
-                // has styling that expects it to be present
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", null, children)))),
-            /* singleline expand/collapse button */ (showExpandButton || (!isMultiline && !actionsDiv && truncated)) && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: classNames.expandSingleLine },
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_Button__WEBPACK_IMPORTED_MODULE_6__.IconButton, (0,tslib__WEBPACK_IMPORTED_MODULE_7__.__assign)({ disabled: false, className: classNames.expand, onClick: handleToggleExpandSingleLine, iconProps: expandIconProps, ariaLabel: overflowButtonAriaLabel, "aria-expanded": expandSingleLine }, expandButtonProps)))), /* singleline actions */
-            !isMultiline && actionsDiv,
-            /* singleline dismiss */ !isMultiline && dismissButton && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { className: classNames.dismissSingleLine }, dismissButton)), /* multiline dismiss */
-            isMultiline && dismissButton), /* multiline actions */
-        isMultiline && actionsDiv));
-});
-MessageBarBase.displayName = COMPONENT_NAME;
-
-
-/***/ }),
-
-/***/ 827:
-/*!******************************************************************************!*\
-  !*** ./node_modules/@fluentui/react/lib/components/MessageBar/MessageBar.js ***!
-  \******************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   MessageBar: () => (/* binding */ MessageBar)
-/* harmony export */ });
-/* harmony import */ var _Utilities__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../../Utilities */ 5336);
-/* harmony import */ var _MessageBar_base__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./MessageBar.base */ 5669);
-/* harmony import */ var _MessageBar_styles__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./MessageBar.styles */ 4514);
-
-
-
-var MessageBar = (0,_Utilities__WEBPACK_IMPORTED_MODULE_0__.styled)(_MessageBar_base__WEBPACK_IMPORTED_MODULE_1__.MessageBarBase, _MessageBar_styles__WEBPACK_IMPORTED_MODULE_2__.getStyles, undefined, {
-    scope: 'MessageBar',
-});
-
-
-/***/ }),
-
-/***/ 4514:
-/*!*************************************************************************************!*\
-  !*** ./node_modules/@fluentui/react/lib/components/MessageBar/MessageBar.styles.js ***!
-  \*************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   getStyles: () => (/* binding */ getStyles)
-/* harmony export */ });
-/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! tslib */ 196);
-/* harmony import */ var _Styling__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../../Styling */ 8455);
-/* harmony import */ var _MessageBar_types__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./MessageBar.types */ 6643);
-var _a, _b, _c, _d;
-
-
-
-var GlobalClassNames = {
-    root: 'ms-MessageBar',
-    error: 'ms-MessageBar--error',
-    blocked: 'ms-MessageBar--blocked',
-    severeWarning: 'ms-MessageBar--severeWarning',
-    success: 'ms-MessageBar--success',
-    warning: 'ms-MessageBar--warning',
-    multiline: 'ms-MessageBar-multiline',
-    singleline: 'ms-MessageBar-singleline',
-    dismissalSingleLine: 'ms-MessageBar-dismissalSingleLine',
-    expandingSingleLine: 'ms-MessageBar-expandingSingleLine',
-    content: 'ms-MessageBar-content',
-    iconContainer: 'ms-MessageBar-icon',
-    text: 'ms-MessageBar-text',
-    innerText: 'ms-MessageBar-innerText',
-    dismissSingleLine: 'ms-MessageBar-dismissSingleLine',
-    expandSingleLine: 'ms-MessageBar-expandSingleLine',
-    dismissal: 'ms-MessageBar-dismissal',
-    expand: 'ms-MessageBar-expand',
-    actions: 'ms-MessageBar-actions',
-    actionsSingleline: 'ms-MessageBar-actionsSingleLine',
-};
-var backgroundColor = (_a = {},
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.error] = 'errorBackground',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.blocked] = 'errorBackground',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.success] = 'successBackground',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.warning] = 'warningBackground',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.severeWarning] = 'severeWarningBackground',
-    _a[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.info] = 'infoBackground',
-    _a);
-var iconColor = (_b = {},
-    _b[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.error] = 'errorIcon',
-    _b[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.blocked] = 'errorIcon',
-    _b[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.success] = 'successIcon',
-    _b[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.warning] = 'warningIcon',
-    _b[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.severeWarning] = 'severeWarningIcon',
-    _b[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.info] = 'infoIcon',
-    _b);
-var highContrastBorderColor = (_c = {},
-    _c[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.error] = '#ff0000',
-    _c[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.blocked] = '#ff0000',
-    _c[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.success] = '#bad80a',
-    _c[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.warning] = '#fff100',
-    _c[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.severeWarning] = '#ff0000',
-    _c[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.info] = 'WindowText',
-    _c);
-var highContrastWhiteBorderColor = (_d = {},
-    _d[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.error] = '#e81123',
-    _d[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.blocked] = '#e81123',
-    _d[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.success] = '#107c10',
-    _d[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.warning] = '#966400',
-    _d[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.severeWarning] = '#d83b01',
-    _d[_MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.info] = 'WindowText',
-    _d);
-var getStyles = function (props) {
-    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k, _l;
-    var theme = props.theme, className = props.className, onDismiss = props.onDismiss, truncated = props.truncated, isMultiline = props.isMultiline, expandSingleLine = props.expandSingleLine, _m = props.messageBarType, messageBarType = _m === void 0 ? _MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.info : _m;
-    var semanticColors = theme.semanticColors, fonts = theme.fonts;
-    var SmallScreenSelector = (0,_Styling__WEBPACK_IMPORTED_MODULE_1__.getScreenSelector)(0, _Styling__WEBPACK_IMPORTED_MODULE_1__.ScreenWidthMaxSmall);
-    var classNames = (0,_Styling__WEBPACK_IMPORTED_MODULE_1__.getGlobalClassNames)(GlobalClassNames, theme);
-    var dismissalAndExpandIconStyle = {
-        fontSize: _Styling__WEBPACK_IMPORTED_MODULE_1__.IconFontSizes.xSmall,
-        height: 10,
-        lineHeight: '10px',
-        color: semanticColors.messageText,
-        selectors: (_a = {},
-            _a[_Styling__WEBPACK_IMPORTED_MODULE_1__.HighContrastSelector] = (0,tslib__WEBPACK_IMPORTED_MODULE_2__.__assign)((0,tslib__WEBPACK_IMPORTED_MODULE_2__.__assign)({}, (0,_Styling__WEBPACK_IMPORTED_MODULE_1__.getHighContrastNoAdjustStyle)()), { color: 'WindowText' }),
-            _a),
-    };
-    var dismissalAndExpandStyle = [
-        (0,_Styling__WEBPACK_IMPORTED_MODULE_1__.getFocusStyle)(theme, {
-            inset: 1,
-            highContrastStyle: {
-                outlineOffset: '-6px',
-                outline: '1px solid Highlight',
-            },
-            borderColor: 'transparent',
-        }),
-        {
-            flexShrink: 0,
-            width: 32,
-            height: 32,
-            padding: '8px 12px',
-            selectors: {
-                '& .ms-Button-icon': dismissalAndExpandIconStyle,
-                ':hover': {
-                    backgroundColor: 'transparent',
-                },
-                ':active': {
-                    backgroundColor: 'transparent',
-                },
-            },
-        },
-    ];
-    return {
-        root: [
-            classNames.root,
-            fonts.medium,
-            messageBarType === _MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.error && classNames.error,
-            messageBarType === _MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.blocked && classNames.blocked,
-            messageBarType === _MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.severeWarning && classNames.severeWarning,
-            messageBarType === _MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.success && classNames.success,
-            messageBarType === _MessageBar_types__WEBPACK_IMPORTED_MODULE_0__.MessageBarType.warning && classNames.warning,
-            isMultiline ? classNames.multiline : classNames.singleline,
-            !isMultiline && onDismiss && classNames.dismissalSingleLine,
-            !isMultiline && truncated && classNames.expandingSingleLine,
-            {
-                background: semanticColors[backgroundColor[messageBarType]],
-                boxSizing: 'border-box',
-                color: semanticColors.messageText,
-                minHeight: 32,
-                width: '100%',
-                display: 'flex',
-                wordBreak: 'break-word',
-                selectors: (_b = {
-                        '.ms-Link': {
-                            color: semanticColors.messageLink,
-                            selectors: {
-                                ':hover': {
-                                    color: semanticColors.messageLinkHovered,
-                                },
-                            },
-                        }
-                    },
-                    _b[_Styling__WEBPACK_IMPORTED_MODULE_1__.HighContrastSelector] = (0,tslib__WEBPACK_IMPORTED_MODULE_2__.__assign)((0,tslib__WEBPACK_IMPORTED_MODULE_2__.__assign)({}, (0,_Styling__WEBPACK_IMPORTED_MODULE_1__.getHighContrastNoAdjustStyle)()), { background: 'transparent', border: "1px solid ".concat(highContrastBorderColor[messageBarType]), color: 'WindowText' }),
-                    _b[_Styling__WEBPACK_IMPORTED_MODULE_1__.HighContrastSelectorWhite] = {
-                        border: "1px solid ".concat(highContrastWhiteBorderColor[messageBarType]),
-                    },
-                    _b),
-            },
-            isMultiline && {
-                flexDirection: 'column',
-            },
-            className,
-        ],
-        content: [
-            classNames.content,
-            (_c = {
-                    display: 'flex',
-                    width: '100%',
-                    lineHeight: 'normal'
-                },
-                _c[SmallScreenSelector] = {
-                    display: 'grid',
-                    gridTemplateColumns: 'auto 1fr auto',
-                    gridTemplateRows: '1fr auto',
-                    gridTemplateAreas: "\n            \"icon text close\"\n            \"action action action\"\n          ",
-                },
-                _c),
-        ],
-        iconContainer: [
-            classNames.iconContainer,
-            (_d = {
-                    fontSize: _Styling__WEBPACK_IMPORTED_MODULE_1__.IconFontSizes.medium,
-                    minWidth: 16,
-                    minHeight: 16,
-                    display: 'flex',
-                    flexShrink: 0,
-                    margin: '8px 0 8px 12px'
-                },
-                _d[SmallScreenSelector] = {
-                    gridArea: 'icon',
-                },
-                _d),
-        ],
-        icon: {
-            color: semanticColors[iconColor[messageBarType]],
-            selectors: (_e = {},
-                _e[_Styling__WEBPACK_IMPORTED_MODULE_1__.HighContrastSelector] = (0,tslib__WEBPACK_IMPORTED_MODULE_2__.__assign)((0,tslib__WEBPACK_IMPORTED_MODULE_2__.__assign)({}, (0,_Styling__WEBPACK_IMPORTED_MODULE_1__.getHighContrastNoAdjustStyle)()), { color: 'WindowText' }),
-                _e),
-        },
-        text: [
-            classNames.text,
-            (0,tslib__WEBPACK_IMPORTED_MODULE_2__.__assign)((0,tslib__WEBPACK_IMPORTED_MODULE_2__.__assign)({ minWidth: 0, display: 'flex', flexGrow: 1, margin: 8 }, fonts.small), (_f = {}, _f[SmallScreenSelector] = {
-                gridArea: 'text',
-            }, _f.selectors = (_g = {},
-                _g[_Styling__WEBPACK_IMPORTED_MODULE_1__.HighContrastSelector] = (0,tslib__WEBPACK_IMPORTED_MODULE_2__.__assign)({}, (0,_Styling__WEBPACK_IMPORTED_MODULE_1__.getHighContrastNoAdjustStyle)()),
-                _g), _f)),
-            !onDismiss && {
-                marginRight: 12,
-            },
-        ],
-        innerText: [
-            classNames.innerText,
-            {
-                lineHeight: 16,
-                selectors: {
-                    '& span a:last-child': {
-                        paddingLeft: 4,
-                    },
-                },
-            },
-            truncated && {
-                overflow: 'visible',
-                whiteSpace: 'pre-wrap',
-            },
-            !isMultiline && {
-                // In high contrast this causes the top and bottom of links' focus outline to be clipped
-                // (not sure of a good way around that while still maintaining text clipping)
-                overflow: 'hidden',
-                textOverflow: 'ellipsis',
-                whiteSpace: 'nowrap',
-            },
-            !isMultiline &&
-                !truncated && {
-                selectors: (_h = {},
-                    _h[SmallScreenSelector] = {
-                        overflow: 'visible',
-                        whiteSpace: 'pre-wrap',
-                    },
-                    _h),
-            },
-            expandSingleLine && {
-                overflow: 'visible',
-                whiteSpace: 'pre-wrap',
-            },
-        ],
-        dismissSingleLine: [
-            classNames.dismissSingleLine,
-            (_j = {},
-                _j[SmallScreenSelector] = {
-                    gridArea: 'close',
-                },
-                _j),
-        ],
-        expandSingleLine: classNames.expandSingleLine,
-        dismissal: [classNames.dismissal, dismissalAndExpandStyle],
-        expand: [classNames.expand, dismissalAndExpandStyle],
-        actions: [
-            isMultiline ? classNames.actions : classNames.actionsSingleline,
-            (_k = {
-                    display: 'flex',
-                    flexGrow: 0,
-                    flexShrink: 0,
-                    flexBasis: 'auto',
-                    flexDirection: 'row-reverse',
-                    alignItems: 'center',
-                    margin: '0 12px 0 8px',
-                    // reset forced colors to browser control for inner actions
-                    forcedColorAdjust: 'auto',
-                    MsHighContrastAdjust: 'auto'
-                },
-                _k[SmallScreenSelector] = {
-                    gridArea: 'action',
-                    marginRight: 8,
-                    marginBottom: 8,
-                },
-                _k.selectors = {
-                    '& button:nth-child(n+2)': (_l = {
-                            marginLeft: 8
-                        },
-                        _l[SmallScreenSelector] = {
-                            marginBottom: 0,
-                        },
-                        _l),
-                },
-                _k),
-            isMultiline && {
-                marginBottom: 8,
-            },
-            onDismiss &&
-                !isMultiline && {
-                marginRight: 0,
-            },
-        ],
-    };
-};
-
-
-/***/ }),
-
-/***/ 6643:
-/*!************************************************************************************!*\
-  !*** ./node_modules/@fluentui/react/lib/components/MessageBar/MessageBar.types.js ***!
-  \************************************************************************************/
-/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
-
-__webpack_require__.r(__webpack_exports__);
-/* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   MessageBarType: () => (/* binding */ MessageBarType)
-/* harmony export */ });
-/**
- * {@docCategory MessageBar}
- */
-var MessageBarType;
-(function (MessageBarType) {
-    /** Info styled MessageBar */
-    MessageBarType[MessageBarType["info"] = 0] = "info";
-    /** Error styled MessageBar */
-    MessageBarType[MessageBarType["error"] = 1] = "error";
-    /** Blocked styled MessageBar */
-    MessageBarType[MessageBarType["blocked"] = 2] = "blocked";
-    /** SevereWarning styled MessageBar */
-    MessageBarType[MessageBarType["severeWarning"] = 3] = "severeWarning";
-    /** Success styled MessageBar */
-    MessageBarType[MessageBarType["success"] = 4] = "success";
-    /** Warning styled MessageBar */
-    MessageBarType[MessageBarType["warning"] = 5] = "warning";
-})(MessageBarType || (MessageBarType = {}));
 
 
 /***/ }),
