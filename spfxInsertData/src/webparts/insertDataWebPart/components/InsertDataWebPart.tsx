@@ -185,7 +185,16 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   // The form you see on the page
   return (
     <div>
-      <PrimaryButton text="Create Item" onClick={() => setShowForm(true)} style={{ marginBottom: 16 }} />
+      <PrimaryButton text="Create Item" onClick={() => {
+        setTitle('');
+        setBody('');
+        setLetter('');
+        setTitleError(undefined);
+        setBodyError(undefined);
+        setLetterError(undefined);
+        setEditingItem(null);
+        setShowForm(true);
+      }} style={{ marginBottom: 16 }} />
       <Dialog
         hidden={!showForm}
         onDismiss={() => setShowForm(false)}
