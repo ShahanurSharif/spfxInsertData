@@ -12,6 +12,7 @@
     "test": "gulp test"
   },
   "dependencies": {
+    "@faker-js/faker": "^9.8.0",
     "@fluentui/react": "^8.106.4",
     "@microsoft/sp-component-base": "1.21.1",
     "@microsoft/sp-core-library": "1.21.1",
