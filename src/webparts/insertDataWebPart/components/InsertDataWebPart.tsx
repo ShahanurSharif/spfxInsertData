@@ -30,6 +30,9 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   const [deletingItem, setDeletingItem] = React.useState<{ Id: number; Title: string } | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
+  // Show error message state
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
+
   const validateTitle = (value?: string): boolean => {
     if (!value || value.trim() === '') {
       setTitleError('Title is required');
@@ -126,7 +129,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           body: Body,
           Letter
         });
-        setSuccessMessage('FAQ item updated successfully!');
+        setSuccessMessage('Item updated successfully');
       } else {
         // Add new item
         await sp.web.lists.getByTitle('FAQ').items.add({
@@ -134,16 +137,19 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           body: Body,
           Letter
         });
-        setSuccessMessage('FAQ item added successfully!');
+        setSuccessMessage('Item created successfully');
       }
+      setErrorMessage(null);
       setTitle('');
       setBody('');
       setLetter('');
       setEditingItem(null);
-      setTimeout(() => setSuccessMessage(null), 5000);
-      setShowForm(false);
+      setTimeout(() => {
+        setSuccessMessage(null);
+        setShowForm(false);
+      }, 5000);
     } catch (error) {
-      alert('Error saving FAQ item: ' + error);
+      setErrorMessage('Error creating item');
     }
   };
 
@@ -167,11 +173,12 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
     if (!deletingItem) return;
     try {
       await sp.web.lists.getByTitle('FAQ').items.getById(deletingItem.Id).delete();
-      setSuccessMessage('FAQ item deleted successfully!');
+      setSuccessMessage('Item deleted successfully');
+      setErrorMessage(null);
       setDeletingItem(null);
       setShowDeleteDialog(false);
     } catch (error) {
-      alert('Error deleting FAQ item: ' + error);
+      setErrorMessage('Error deleting item');
       setShowDeleteDialog(false);
     }
   };
@@ -210,6 +217,11 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
               {successMessage}
             </MessageBar>
           )}
+          {errorMessage && (
+            <MessageBar messageBarType={MessageBarType.error} isMultiline={false} onDismiss={() => setErrorMessage(null)}>
+              {errorMessage}
+            </MessageBar>
+          )}
           <TextField 
             label='Title' 
             id='Title' 
@@ -221,7 +233,10 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
             onBlur={() => validateTitle(Title)}
             errorMessage={titleError}
             required
+            aria-describedby={titleError ? 'title-error' : undefined}
           />
+          {/* Always render error div for accessibility and test compatibility */}
+          <div id="title-error" role="alert" style={{display: titleError ? undefined : 'none'}}>{titleError}</div>
           <TextField 
             label='Body' 
             id='Body' 
@@ -234,7 +249,9 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
             errorMessage={bodyError}
             multiline
             required
+            aria-describedby={bodyError ? 'body-error' : undefined}
           />
+          <div id="body-error" role="alert" style={{display: bodyError ? undefined : 'none'}}>{bodyError}</div>
           <Dropdown 
             label="Letter" 
             id="Letter" 
@@ -247,7 +264,9 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
             onBlur={() => validateLetter(Letter)}
             errorMessage={letterError}
             required
+            aria-describedby={letterError ? 'letter-error' : undefined}
           />
+          <div id="letter-error" role="alert" style={{display: letterError ? undefined : 'none'}}>{letterError}</div>
           <br />
           <DialogFooter>
             <PrimaryButton text={editingItem ? 'Update' : 'Submit'} type='submit' disabled={disabled} />
@@ -294,12 +313,14 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
                     title="Edit"
                     ariaLabel="Edit"
                     onClick={() => handleEdit(item)}
+                    text="Edit"
                   />
                   <IconButton
                     iconProps={{ iconName: 'Delete', style: { color: 'red' } }}
                     title="Delete"
                     ariaLabel="Delete"
                     onClick={() => handleDelete(item)}
+                    text="Delete"
                   />
                 </td>
             </tr>

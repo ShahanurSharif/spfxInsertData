@@ -1,5 +1,6 @@
 /// <reference types="jest" />
-import { render, screen, fireEvent } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import '@testing-library/jest-dom';
 import InsertDataWebPart from './components/InsertDataWebPart';
 import { faker } from '@faker-js/faker';
@@ -7,7 +8,9 @@ import * as React from 'react';
 
 // Provide all required props for IInsertDataWebPartProps
 // Mock a minimal WebPartContext for testing
-const mockContext = {}; // Use 'as any' to bypass type checking for tests
+import { WebPartContext } from '@microsoft/sp-webpart-base';
+
+const mockContext = {} as unknown as WebPartContext;
 
 const mockProps = {
   context: mockContext,
@@ -26,106 +29,95 @@ describe('InsertDataWebPart', () => {
 
   it('opens the form dialog when Create Item is clicked', () => {
     render(<InsertDataWebPart {...mockProps} />);
-    fireEvent.click(screen.getByText('Create Item'));
+    userEvent.click(screen.getByText('Create Item'));
     expect(screen.getByText('Create FAQ Item')).toBeInTheDocument();
   });
 
-  it('shows validation errors if required fields are empty', () => {
+  it('shows validation errors if required fields are empty', async () => {
     render(<InsertDataWebPart {...mockProps} />);
-    fireEvent.click(screen.getByText('Create Item'));
-    fireEvent.click(screen.getByText('Submit'));
-    expect(screen.getByText('Title is required')).toBeInTheDocument();
-    expect(screen.getByText('Body is required')).toBeInTheDocument();
-    expect(screen.getByText('Letter is required')).toBeInTheDocument();
+    userEvent.click(screen.getByText('Create Item'));
+    userEvent.click(screen.getByText('Submit'));
+    // Fluent UI renders errors as aria-live messages, so query by role alert
+    const alerts = await screen.findAllByRole('alert');
+    expect(alerts.some(a => a.textContent?.match(/Title is required/i))).toBe(true);
+    expect(alerts.some(a => a.textContent?.match(/Body is required/i))).toBe(true);
+    expect(alerts.some(a => a.textContent?.match(/Letter is required/i))).toBe(true);
   });
 
-  // Add more tests for edit, delete, and form submission as needed
-  it('create an item successfully', () => {
+  async function selectDropdownOption(label: string, optionText: string) {
+    userEvent.click(screen.getByLabelText(label));
+    // The dropdown options are rendered in a portal, so use getByRole('listbox')
+    const listbox = await screen.findByRole('listbox');
+    const option = within(listbox).getByText(optionText);
+    userEvent.click(option);
+  }
+
+  it('create an item successfully', async () => {
     render(<InsertDataWebPart {...mockProps}/>);
-    fireEvent.click(screen.getByText('Create Item'));
-    // Generate a fake title using faker
+    userEvent.click(screen.getByText('Create Item'));
     const fakeTitle = faker.lorem.sentence();
-    fireEvent.change(screen.getByLabelText('Title'), { target: { value: fakeTitle } });
-    fireEvent.change(screen.getByLabelText('Body'), { target: { value: faker.lorem.paragraph() } });
-    const letters = ['A', 'B', 'C'];
-    const randomLetter = letters[Math.floor(Math.random() * letters.length)];
-    fireEvent.change(screen.getByLabelText('Letter'), { target: { value: randomLetter } });
-    fireEvent.click(screen.getByText('Submit'));
-    expect(screen.getByText('Item created successfully')).toBeInTheDocument();
+    userEvent.type(screen.getByLabelText('Title'), fakeTitle);
+    userEvent.type(screen.getByLabelText('Body'), faker.lorem.paragraph());
+    await selectDropdownOption('Letter', 'A');
+    userEvent.click(screen.getByText('Submit'));
+    expect(await screen.findByText('Item created successfully')).toBeInTheDocument();
     expect(screen.getByText(fakeTitle)).toBeInTheDocument();
-    expect(screen.getByText(randomLetter)).toBeInTheDocument(); 
+    expect(screen.getByText('A')).toBeInTheDocument(); 
   });
 
-  it('shows error message if item creation fails', () => {
-    // Mock the fetch call to simulate an error
-    window.fetch = jest.fn(() =>
-      Promise.reject(new Error('Network error'))
-    ) as jest.Mock;
-
+  it('shows error message if item creation fails', async () => {
+    window.fetch = jest.fn(() => Promise.reject(new Error('Network error'))) as jest.Mock;
     render(<InsertDataWebPart {...mockProps} />);
-    fireEvent.click(screen.getByText('Create Item'));
-    fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'Test Title' } });
-    fireEvent.change(screen.getByLabelText('Body'), { target: { value: 'Test Body' } });
-    fireEvent.change(screen.getByLabelText('Letter'), { target: { value: 'A' } });
-    fireEvent.click(screen.getByText('Submit'));
-    
-    expect(screen.getByText('Error creating item')).toBeInTheDocument();
+    userEvent.click(screen.getByText('Create Item'));
+    userEvent.type(screen.getByLabelText('Title'), 'Test Title');
+    userEvent.type(screen.getByLabelText('Body'), 'Test Body');
+    await selectDropdownOption('Letter', 'A');
+    userEvent.click(screen.getByText('Submit'));
+    expect(await screen.findByText('Error creating item')).toBeInTheDocument();
   });
-  it('edits an item successfully', () => {  
+
+  it('edits an item successfully', async () => {  
     render(<InsertDataWebPart {...mockProps} />);
-    fireEvent.click(screen.getByText('Create Item'));
+    userEvent.click(screen.getByText('Create Item'));
     const fakeTitle = faker.lorem.sentence();
-    fireEvent.change(screen.getByLabelText('Title'), { target: { value: fakeTitle } });
-    fireEvent.change(screen.getByLabelText('Body'), { target: { value: faker.lorem.paragraph() } });
-    const letters = ['A', 'B', 'C'];
-    const randomLetter = letters[Math.floor(Math.random() * letters.length)];
-    fireEvent.change(screen.getByLabelText('Letter'), { target: { value: randomLetter } });
-    fireEvent.click(screen.getByText('Submit'));
-    
+    userEvent.type(screen.getByLabelText('Title'), fakeTitle);
+    userEvent.type(screen.getByLabelText('Body'), faker.lorem.paragraph());
+    await selectDropdownOption('Letter', 'A');
+    userEvent.click(screen.getByText('Submit'));
     // Now edit the item
-    fireEvent.click(screen.getByText('Edit'));
+    userEvent.click(screen.getByText('Edit'));
     const newFakeTitle = faker.lorem.sentence();
-    fireEvent.change(screen.getByLabelText('Title'), { target: { value: newFakeTitle } });
-    fireEvent.click(screen.getByText('Submit'));
-    
-    expect(screen.getByText('Item updated successfully')).toBeInTheDocument();
+    const titleInput = screen.getByLabelText('Title');
+    userEvent.clear(titleInput);
+    userEvent.type(titleInput, newFakeTitle);
+    userEvent.click(screen.getByText('Submit'));
+    expect(await screen.findByText('Item updated successfully')).toBeInTheDocument();
     expect(screen.getByText(newFakeTitle)).toBeInTheDocument();
-  }
-  );
-  it('deletes an item successfully', () => {
-    render(<InsertDataWebPart {...mockProps} />);
-    fireEvent.click(screen.getByText('Create Item'));
-    const fakeTitle = faker.lorem.sentence();
-    fireEvent.change(screen.getByLabelText('Title'), { target: { value: fakeTitle } });
-    fireEvent.change(screen.getByLabelText('Body'), { target: { value: faker.lorem.paragraph() } });
-    const letters = ['A', 'B', 'C'];
-    const randomLetter = letters[Math.floor(Math.random() * letters.length)];
-    fireEvent.change(screen.getByLabelText('Letter'), { target: { value: randomLetter } });
-    fireEvent.click(screen.getByText('Submit'));
-    
-    // Now delete the item
-    fireEvent.click(screen.getByText('Delete'));
-    
-    expect(screen.queryByText(fakeTitle)).not.toBeInTheDocument();
-  }
-  );
-  it('shows error message if item deletion fails', () => {
-    // Mock the fetch call to simulate an error
-    window.fetch = jest.fn(() =>
-      Promise.reject(new Error('Network error'))
-    ) as jest.Mock;
-
-    render(<InsertDataWebPart {...mockProps} />);
-    fireEvent.click(screen.getByText('Create Item'));
-    fireEvent.change(screen.getByLabelText('Title'), { target: { value: 'Test Title' } });
-    fireEvent.change(screen.getByLabelText('Body'), { target: { value: 'Test Body' } });
-    fireEvent.change(screen.getByLabelText('Letter'), { target: { value: 'A' } });
-    fireEvent.click(screen.getByText('Submit'));
-    
-    // Now try to delete the item
-    fireEvent.click(screen.getByText('Delete'));
-
-    expect(screen.getByText('Error deleting item')).toBeInTheDocument();
   });
 
+  it('deletes an item successfully', async () => {
+    render(<InsertDataWebPart {...mockProps} />);
+    userEvent.click(screen.getByText('Create Item'));
+    const fakeTitle = faker.lorem.sentence();
+    userEvent.type(screen.getByLabelText('Title'), fakeTitle);
+    userEvent.type(screen.getByLabelText('Body'), faker.lorem.paragraph());
+    await selectDropdownOption('Letter', 'A');
+    userEvent.click(screen.getByText('Submit'));
+    // Now delete the item
+    userEvent.click(screen.getByText('Delete'));
+    expect(screen.queryByText(fakeTitle)).not.toBeInTheDocument();
+  });
+
+  it('shows error message if item deletion fails', async () => {
+    window.fetch = jest.fn(() => Promise.reject(new Error('Network error'))) as jest.Mock;
+    render(<InsertDataWebPart {...mockProps} />);
+    userEvent.click(screen.getByText('Create Item'));
+    userEvent.type(screen.getByLabelText('Title'), 'Test Title');
+    userEvent.type(screen.getByLabelText('Body'), 'Test Body');
+    await selectDropdownOption('Letter', 'A');
+    userEvent.click(screen.getByText('Submit'));
+    // Now try to delete the item
+    userEvent.click(screen.getByText('Delete'));
+    expect(await screen.findByText('Error deleting item')).toBeInTheDocument();
+  });
 });
