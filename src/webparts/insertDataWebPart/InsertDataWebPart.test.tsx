@@ -6,8 +6,11 @@ import { faker } from '@faker-js/faker';
 import * as React from 'react';
 
 // Provide all required props for IInsertDataWebPartProps
+// Mock a minimal WebPartContext for testing
+const mockContext = {}; // Use 'as any' to bypass type checking for tests
+
 const mockProps = {
-  context: {} as any,
+  context: mockContext,
   description: '',
   isDarkTheme: false,
   environmentMessage: '',
