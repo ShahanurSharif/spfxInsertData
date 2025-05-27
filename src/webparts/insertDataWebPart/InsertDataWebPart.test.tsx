@@ -69,9 +69,25 @@ describe('InsertDataWebPart', () => {
   }
 
   it('create an item successfully', async () => {
+    const fakeTitle = faker.lorem.sentence();
+    // Mock both add (POST) and fetch (GET) requests
+    window.fetch = jest.fn()
+      // First call: add item (POST)
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ Id: 1, Title: fakeTitle, Body: fakeTitle, Letter: 'A' })
+        })
+      )
+      // Second call: fetch items (GET)
+      .mockImplementationOnce(() =>
+        Promise.resolve({
+          ok: true,
+          json: () => Promise.resolve({ value: [{ Id: 1, Title: fakeTitle, body: fakeTitle, Letter: 'A' }] })
+        })
+      );
     render(<InsertDataWebPart {...mockProps}/>);
     userEvent.click(screen.getByText('Create Item'));
-    const fakeTitle = faker.lorem.sentence();
     userEvent.type(screen.getByLabelText('Title'), fakeTitle);
     userEvent.type(screen.getByLabelText('Body'), fakeTitle);
     await selectDropdownOption('Letter', 'A');
