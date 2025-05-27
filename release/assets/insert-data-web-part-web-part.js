@@ -211,6 +211,14 @@ var InsertDataWebPart = function (props) {
                     _a.sent();
                     setSuccessMessage('Item updated successfully');
                     setErrorMessage(null);
+                    setTitle('');
+                    setBody('');
+                    setLetter('');
+                    setEditingItem(null);
+                    setTimeout(function () {
+                        setSuccessMessage(null);
+                        setShowForm(false); // Close dialog after update
+                    }, 3000);
                     return [3 /*break*/, 5];
                 case 3: 
                 // Add new item
@@ -224,17 +232,15 @@ var InsertDataWebPart = function (props) {
                     _a.sent();
                     setSuccessMessage('Item created successfully');
                     setErrorMessage(null);
-                    _a.label = 5;
-                case 5:
                     setTitle('');
                     setBody('');
                     setLetter('');
-                    setEditingItem(null);
+                    // Dialog stays open on create (do not close)
                     setTimeout(function () {
                         setSuccessMessage(null);
-                        setShowForm(false);
-                    }, 5000);
-                    return [3 /*break*/, 7];
+                    }, 3000);
+                    _a.label = 5;
+                case 5: return [3 /*break*/, 7];
                 case 6:
                     error_1 = _a.sent();
                     setErrorMessage('Error creating item');
@@ -289,13 +295,13 @@ var InsertDataWebPart = function (props) {
         setDeletingItem(null);
         setShowDeleteDialog(false);
     };
-    // Success message auto-dismiss effect
+    // Success message auto-dismiss effect (only for create, update handled in handleSubmit)
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        if (!showForm && successMessage) {
+        if (!showForm && successMessage && !editingItem) {
             var timer_1 = setTimeout(function () { return setSuccessMessage(null); }, 3000);
             return function () { return clearTimeout(timer_1); };
         }
-    }, [successMessage, showForm]);
+    }, [successMessage, showForm, editingItem]);
     // The form you see on the page
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null,
         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: "Create Item", onClick: function () {
@@ -308,8 +314,8 @@ var InsertDataWebPart = function (props) {
                 setEditingItem(null);
                 setShowForm(true);
             }, style: { marginBottom: 16 } }),
-        !showForm && successMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_6__.MessageBar, { messageBarType: _fluentui_react__WEBPACK_IMPORTED_MODULE_7__.MessageBarType.success, isMultiline: false, "data-testid": "success-message", role: "alert", onDismiss: undefined, styles: { root: { margin: '12px 0' } } }, successMessage)),
-        !showForm && errorMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_6__.MessageBar, { messageBarType: _fluentui_react__WEBPACK_IMPORTED_MODULE_7__.MessageBarType.error, isMultiline: false, "data-testid": "error-message", role: "alert", onDismiss: function () { return setErrorMessage(null); }, dismissButtonAriaLabel: "Dismiss error message", styles: { root: { margin: '12px 0' } } }, errorMessage)),
+        !showForm && successMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_6__.MessageBar, { messageBarType: _fluentui_react__WEBPACK_IMPORTED_MODULE_7__.MessageBarType.success, isMultiline: false, "data-testid": "success-message", role: "alert", onDismiss: undefined, styles: { root: { position: 'absolute', top: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, minWidth: 320, maxWidth: 480, textAlign: 'center' } } }, successMessage)),
+        !showForm && errorMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_6__.MessageBar, { messageBarType: _fluentui_react__WEBPACK_IMPORTED_MODULE_7__.MessageBarType.error, isMultiline: false, "data-testid": "error-message", role: "alert", onDismiss: function () { return setErrorMessage(null); }, dismissButtonAriaLabel: "Dismiss error message", styles: { root: { position: 'absolute', top: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, minWidth: 320, maxWidth: 480, textAlign: 'center' } } }, errorMessage)),
         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_8__.Dialog, { hidden: !showForm, onDismiss: function () { return setShowForm(false); }, dialogContentProps: {
                 type: _fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_9__.DialogType.largeHeader,
                 title: 'Create FAQ Item',
@@ -334,7 +340,7 @@ var InsertDataWebPart = function (props) {
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_12__.DialogFooter, null,
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: editingItem ? 'Update' : 'Submit', type: 'submit', disabled: disabled }),
-                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: "Cancel", onClick: function () { setShowForm(false); setEditingItem(null); } })))),
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: "Close", onClick: function () { setShowForm(false); setEditingItem(null); } })))),
         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_8__.Dialog, { hidden: !showDeleteDialog, onDismiss: cancelDelete, dialogContentProps: {
                 type: _fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_9__.DialogType.normal,
                 title: 'Delete FAQ Item',

@@ -129,6 +129,14 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
         });
         setSuccessMessage('Item updated successfully');
         setErrorMessage(null);
+        setTitle('');
+        setBody('');
+        setLetter('');
+        setEditingItem(null);
+        setTimeout(() => {
+          setSuccessMessage(null);
+          setShowForm(false); // Close dialog after update
+        }, 3000);
       } else {
         // Add new item
         await sp.web.lists.getByTitle('FAQ').items.add({
@@ -138,15 +146,14 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
         });
         setSuccessMessage('Item created successfully');
         setErrorMessage(null);
+        setTitle('');
+        setBody('');
+        setLetter('');
+        // Dialog stays open on create (do not close)
+        setTimeout(() => {
+          setSuccessMessage(null);
+        }, 3000);
       }
-      setTitle('');
-      setBody('');
-      setLetter('');
-      setEditingItem(null);
-      setTimeout(() => {
-        setSuccessMessage(null);
-        setShowForm(false);
-      }, 5000);
     } catch (error) {
       setErrorMessage('Error creating item');
       setSuccessMessage(null);
@@ -188,13 +195,13 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
     setShowDeleteDialog(false);
   };
 
-  // Success message auto-dismiss effect
+  // Success message auto-dismiss effect (only for create, update handled in handleSubmit)
   React.useEffect(() => {
-    if (!showForm && successMessage) {
+    if (!showForm && successMessage && !editingItem) {
       const timer = setTimeout(() => setSuccessMessage(null), 3000);
       return () => clearTimeout(timer);
     }
-  }, [successMessage, showForm]);
+  }, [successMessage, showForm, editingItem]);
 
   // The form you see on the page
   return (
@@ -209,7 +216,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
         setEditingItem(null);
         setShowForm(true);
       }} style={{ marginBottom: 16 }} />
-      {/* Render success message outside dialog, auto-dismiss after 3s */}
+      {/* Render success message outside dialog, auto-dismiss after 3s, styled absolute top center */}
       {!showForm && successMessage && (
         <MessageBar
           messageBarType={MessageBarType.success}
@@ -217,12 +224,12 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           data-testid="success-message"
           role="alert"
           onDismiss={undefined}
-          styles={{ root: { margin: '12px 0' } }}
+          styles={{ root: { position: 'absolute', top: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, minWidth: 320, maxWidth: 480, textAlign: 'center' } }}
         >
           {successMessage}
         </MessageBar>
       )}
-      {/* Render error message outside dialog, dismissible by user */}
+      {/* Render error message outside dialog, dismissible by user, styled absolute top center */}
       {!showForm && errorMessage && (
         <MessageBar
           messageBarType={MessageBarType.error}
@@ -231,7 +238,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           role="alert"
           onDismiss={() => setErrorMessage(null)}
           dismissButtonAriaLabel="Dismiss error message"
-          styles={{ root: { margin: '12px 0' } }}
+          styles={{ root: { position: 'absolute', top: 24, left: '50%', transform: 'translateX(-50%)', zIndex: 9999, minWidth: 320, maxWidth: 480, textAlign: 'center' } }}
         >
           {errorMessage}
         </MessageBar>
@@ -303,7 +310,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           <br />
           <DialogFooter>
             <PrimaryButton text={editingItem ? 'Update' : 'Submit'} type='submit' disabled={disabled} />
-            <PrimaryButton text="Cancel" onClick={() => { setShowForm(false); setEditingItem(null); }} />
+            <PrimaryButton text="Close" onClick={() => { setShowForm(false); setEditingItem(null); }} />
           </DialogFooter>
         </form>
       </Dialog>
