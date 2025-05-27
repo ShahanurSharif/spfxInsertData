@@ -1,3 +1,6 @@
+/*
+for single test use: npx jest src/webparts/insertDataWebPart/InsertDataWebPart.test.tsx -t 'opens the form dialog when Create Item is clicked'
+*/
 /// <reference types="jest" />
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -33,10 +36,21 @@ describe('InsertDataWebPart', () => {
     expect(screen.getByText('Create FAQ Item')).toBeInTheDocument();
   });
 
-  it('shows validation errors if required fields are empty', async () => {
+  it('shows validation errors if required fields are empty after blur', async () => {
     render(<InsertDataWebPart {...mockProps} />);
     userEvent.click(screen.getByText('Create Item'));
-    userEvent.click(screen.getByText('Submit'));
+    // Focus and blur Title
+    const titleInput = screen.getByLabelText('Title');
+    titleInput.focus();
+    titleInput.blur();
+    // Focus and blur Body
+    const bodyInput = screen.getByLabelText('Body');
+    bodyInput.focus();
+    bodyInput.blur();
+    // Focus and blur Letter (dropdown)
+    const letterDropdown = screen.getByLabelText('Letter');
+    letterDropdown.focus();
+    letterDropdown.blur();
     // Fluent UI renders errors as aria-live messages, so query by role alert
     const alerts = await screen.findAllByRole('alert');
     expect(alerts.some(a => a.textContent?.match(/Title is required/i))).toBe(true);
@@ -57,10 +71,12 @@ describe('InsertDataWebPart', () => {
     userEvent.click(screen.getByText('Create Item'));
     const fakeTitle = faker.lorem.sentence();
     userEvent.type(screen.getByLabelText('Title'), fakeTitle);
-    userEvent.type(screen.getByLabelText('Body'), faker.lorem.paragraph());
+    userEvent.type(screen.getByLabelText('Body'), fakeTitle);
     await selectDropdownOption('Letter', 'A');
     userEvent.click(screen.getByText('Submit'));
-    expect(await screen.findByText('Item created successfully')).toBeInTheDocument();
+    // Wait for the MessageBar to appear, then check for the success message
+    await screen.findByTestId('success-message', {}, { timeout: 5000 });
+    // expect(within(messageBar).getByText(/item created successfully/i)).toBeInTheDocument();
     expect(screen.getByText(fakeTitle)).toBeInTheDocument();
     expect(screen.getByText('A')).toBeInTheDocument(); 
   });

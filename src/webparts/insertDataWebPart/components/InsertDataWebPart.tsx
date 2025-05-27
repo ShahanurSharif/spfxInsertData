@@ -1,6 +1,6 @@
 import * as React from 'react';
 import type { IInsertDataWebPartProps } from './IInsertDataWebPartProps';
-import { Dropdown, IDropdownOption, TextField, PrimaryButton } from '@fluentui/react';
+import { Dropdown, IDropdownOption, TextField, PrimaryButton, MessageBar, MessageBarType } from '@fluentui/react';
 import { Dialog, DialogType, DialogFooter } from '@fluentui/react/lib/Dialog';
 import { sp } from '@pnp/sp-commonjs';
 import '@pnp/sp/webs';
@@ -188,6 +188,14 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
     setShowDeleteDialog(false);
   };
 
+  // Success message auto-dismiss effect
+  React.useEffect(() => {
+    if (!showForm && successMessage) {
+      const timer = setTimeout(() => setSuccessMessage(null), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [successMessage, showForm]);
+
   // The form you see on the page
   return (
     <div>
@@ -201,6 +209,33 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
         setEditingItem(null);
         setShowForm(true);
       }} style={{ marginBottom: 16 }} />
+      {/* Render success message outside dialog, auto-dismiss after 3s */}
+      {!showForm && successMessage && (
+        <MessageBar
+          messageBarType={MessageBarType.success}
+          isMultiline={false}
+          data-testid="success-message"
+          role="alert"
+          onDismiss={undefined}
+          styles={{ root: { margin: '12px 0' } }}
+        >
+          {successMessage}
+        </MessageBar>
+      )}
+      {/* Render error message outside dialog, dismissible by user */}
+      {!showForm && errorMessage && (
+        <MessageBar
+          messageBarType={MessageBarType.error}
+          isMultiline={false}
+          data-testid="error-message"
+          role="alert"
+          onDismiss={() => setErrorMessage(null)}
+          dismissButtonAriaLabel="Dismiss error message"
+          styles={{ root: { margin: '12px 0' } }}
+        >
+          {errorMessage}
+        </MessageBar>
+      )}
       <Dialog
         hidden={!showForm}
         onDismiss={() => setShowForm(false)}
@@ -211,10 +246,6 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
         modalProps={{ isBlocking: false }}
       >
         <form onSubmit={handleSubmit}>
-          {/* Render success and error messages as unique, visible alerts above the form */}
-          {successMessage && (
-            <div role="alert" data-testid="success-message" style={{ marginBottom: 8, color: 'green' }}>{successMessage}</div>
-          )}
           {/* Render error message only inside dialog when dialog is open */}
           {showForm && errorMessage && (
             <div role="alert" data-testid="error-message" style={{ marginBottom: 8, color: 'red' }}>{errorMessage}</div>
@@ -276,13 +307,6 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           </DialogFooter>
         </form>
       </Dialog>
-      {/* Render success/error message only outside dialog when dialog is closed */}
-      {!showForm && successMessage && (
-        <div role="alert" data-testid="success-message" style={{ color: 'green', margin: '12px 0' }}>{successMessage}</div>
-      )}
-      {!showForm && errorMessage && (
-        <div role="alert" data-testid="error-message" style={{ color: 'red', margin: '12px 0' }}>{errorMessage}</div>
-      )}
       {/* Delete Confirmation Dialog */}
       <Dialog
         hidden={!showDeleteDialog}
