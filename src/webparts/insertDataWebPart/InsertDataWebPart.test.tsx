@@ -116,9 +116,16 @@ describe('InsertDataWebPart', () => {
     await screen.findByText(fakeTitle);
 
     // Find the item row by its title
+
     const itemRow = await screen.findByText(fakeTitle);
     expect(itemRow).toBeInTheDocument();
 
+    const row = itemRow.closest('tr');
+    // Use querySelector to find the edit button by data-testid prefix
+    const editButton = row && row.querySelector('[data-testid^="edit-button-"]');
+    expect(editButton).not.toBeNull();
+    // userEvent.click requires a non-null Element, so cast is safe after the check
+    userEvent.click(editButton as HTMLElement);
     
     // Perform the edit
     // const newFakeTitle = faker.lorem.sentence();
