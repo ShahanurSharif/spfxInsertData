@@ -29,6 +29,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   const [editingItem, setEditingItem] = React.useState<{ Id: number; Title: string; body: string; Letter: string } | null>(null);
   const [deletingItem, setDeletingItem] = React.useState<{ Id: number; Title: string } | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
+  const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
 
   const validateTitle = (value?: string): boolean => {
     if (!value || value.trim() === '') {
@@ -112,6 +113,8 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   // When you click the button, try to add or update the item
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
+    setErrorMessage(null);
+    setSuccessMessage(null);
     const isTitleValid = validateTitle(Title);
     const isBodyValid = validateBody(Body);
     const isLetterValid = validateLetter(Letter);
@@ -126,7 +129,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           body: Body,
           Letter
         });
-        setSuccessMessage('FAQ item updated successfully!');
+        setSuccessMessage('Item updated successfully');
       } else {
         // Add new item
         await sp.web.lists.getByTitle('FAQ').items.add({
@@ -134,7 +137,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           body: Body,
           Letter
         });
-        setSuccessMessage('FAQ item added successfully!');
+        setSuccessMessage('Item created successfully');
       }
       setTitle('');
       setBody('');
@@ -143,7 +146,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
       setTimeout(() => setSuccessMessage(null), 5000);
       setShowForm(false);
     } catch (error) {
-      alert('Error saving FAQ item: ' + error);
+      setErrorMessage('Error creating item');
     }
   };
 
@@ -165,13 +168,15 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   // Confirm delete
   const confirmDelete = async (): Promise<void> => {
     if (!deletingItem) return;
+    setErrorMessage(null);
+    setSuccessMessage(null);
     try {
       await sp.web.lists.getByTitle('FAQ').items.getById(deletingItem.Id).delete();
-      setSuccessMessage('FAQ item deleted successfully!');
+      setSuccessMessage('Item deleted successfully');
       setDeletingItem(null);
       setShowDeleteDialog(false);
     } catch (error) {
-      alert('Error deleting FAQ item: ' + error);
+      setErrorMessage('Error deleting item');
       setShowDeleteDialog(false);
     }
   };
@@ -185,6 +190,13 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   // The form you see on the page
   return (
     <div>
+      {/* Render success/error message only outside dialog when dialog is closed */}
+      {!showForm && successMessage && (
+        <div role="alert" data-testid="success-message" style={{ color: 'green', margin: '12px 0' }}>{successMessage}</div>
+      )}
+      {!showForm && errorMessage && (
+        <div role="alert" data-testid="error-message" style={{ color: 'red', margin: '12px 0' }}>{errorMessage}</div>
+      )}
       <PrimaryButton text="Create Item" onClick={() => {
         setTitle('');
         setBody('');
@@ -205,10 +217,9 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
         modalProps={{ isBlocking: false }}
       >
         <form onSubmit={handleSubmit}>
-          {successMessage && (
-            <MessageBar messageBarType={MessageBarType.success} isMultiline={false} onDismiss={() => setSuccessMessage(null)}>
-              {successMessage}
-            </MessageBar>
+          {/* Render error message only inside dialog when dialog is open */}
+          {showForm && errorMessage && (
+            <div role="alert" data-testid="error-message" style={{ marginBottom: 8, color: 'red' }}>{errorMessage}</div>
           )}
           <TextField 
             label='Title' 
@@ -219,9 +230,13 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
               validateTitle(v);
             }} 
             onBlur={() => validateTitle(Title)}
-            errorMessage={titleError}
             required
+            aria-describedby={titleError ? 'title-error' : undefined}
           />
+          {/* Always render error divs for accessibility, but only show text if error exists */}
+          <div id="title-error" role="alert" data-testid="title-error" style={{ color: 'red', minHeight: 18 }}>
+            {titleError ? titleError : ''}
+          </div>
           <TextField 
             label='Body' 
             id='Body' 
@@ -231,10 +246,13 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
               validateBody(v);
             }} 
             onBlur={() => validateBody(Body)}
-            errorMessage={bodyError}
             multiline
             required
+            aria-describedby={bodyError ? 'body-error' : undefined}
           />
+          <div id="body-error" role="alert" data-testid="body-error" style={{ color: 'red', minHeight: 18 }}>
+            {bodyError ? bodyError : ''}
+          </div>
           <Dropdown 
             label="Letter" 
             id="Letter" 
@@ -245,9 +263,12 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
               validateLetter(option ? String(option.key) : '');
             }} 
             onBlur={() => validateLetter(Letter)}
-            errorMessage={letterError}
             required
+            aria-describedby={letterError ? 'letter-error' : undefined}
           />
+          <div id="letter-error" role="alert" data-testid="letter-error" style={{ color: 'red', minHeight: 18 }}>
+            {letterError ? letterError : ''}
+          </div>
           <br />
           <DialogFooter>
             <PrimaryButton text={editingItem ? 'Update' : 'Submit'} type='submit' disabled={disabled} />
@@ -288,25 +309,30 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
               <td style={{ borderBottom: '1px solid #eee' }}>{item.Title}</td>
               <td style={{ borderBottom: '1px solid #eee' }}>{item.body}</td>
               <td style={{ borderBottom: '1px solid #eee' }}>{item.Letter}</td>
-                <td style={{ borderBottom: '1px solid #eee' }}>
-                  <IconButton
-                    iconProps={{ iconName: 'Edit', style: { color: 'green' } }}
-                    title="Edit"
-                    ariaLabel="Edit"
-                    onClick={() => handleEdit(item)}
-                  />
-                  <IconButton
-                    iconProps={{ iconName: 'Delete', style: { color: 'red' } }}
-                    title="Delete"
-                    ariaLabel="Delete"
-                    onClick={() => handleDelete(item)}
-                  />
-                </td>
+              <td style={{ borderBottom: '1px solid #eee' }}>
+                <button
+                  type="button"
+                  aria-label="Edit"
+                  data-testid={`edit-button-${item.Id}`}
+                  onClick={() => handleEdit(item)}
+                  style={{ marginRight: 8 }}
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  aria-label="Delete"
+                  data-testid={`delete-button-${item.Id}`}
+                  onClick={() => handleDelete(item)}
+                >
+                  Delete
+                </button>
+              </td>
             </tr>
           ))}
           {faqItems.length === 0 && (
             <tr>
-              <td colSpan={3} style={{ textAlign: 'center', color: '#888' }}>No FAQ items found.</td>
+              <td colSpan={4} style={{ textAlign: 'center', color: '#888' }}>No FAQ items found.</td>
             </tr>
           )}
         </tbody>

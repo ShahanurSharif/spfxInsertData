@@ -305,28 +305,28 @@ var InsertDataWebPart = function (props) {
             }, modalProps: { isBlocking: false } },
             react__WEBPACK_IMPORTED_MODULE_0__.createElement("form", { onSubmit: handleSubmit },
                 successMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "success-message", style: { marginBottom: 8, color: 'green' } }, successMessage)),
-                errorMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "error-message", style: { marginBottom: 8, color: 'red' } }, errorMessage)),
+                showForm && errorMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "error-message", style: { marginBottom: 8, color: 'red' } }, errorMessage)),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_8__.TextField, { label: 'Title', id: 'Title', value: Title, onChange: function (event, v) {
                         setTitle(v || '');
                         validateTitle(v);
                     }, onBlur: function () { return validateTitle(Title); }, required: true, "aria-describedby": titleError ? 'title-error' : undefined }),
-                titleError && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "title-error", role: "alert", "data-testid": "title-error", style: { color: 'red', minHeight: 18 } }, titleError)),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "title-error", role: "alert", "data-testid": "title-error", style: { color: 'red', minHeight: 18 } }, titleError ? titleError : ''),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_8__.TextField, { label: 'Body', id: 'Body', value: Body, onChange: function (event, v) {
                         setBody(v || '');
                         validateBody(v);
                     }, onBlur: function () { return validateBody(Body); }, multiline: true, required: true, "aria-describedby": bodyError ? 'body-error' : undefined }),
-                bodyError && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "body-error", role: "alert", "data-testid": "body-error", style: { color: 'red', minHeight: 18 } }, bodyError)),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "body-error", role: "alert", "data-testid": "body-error", style: { color: 'red', minHeight: 18 } }, bodyError ? bodyError : ''),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_9__.Dropdown, { label: "Letter", id: "Letter", options: options, selectedKey: Letter, onChange: function (event, option) {
                         setLetter(option ? String(option.key) : '');
                         validateLetter(option ? String(option.key) : '');
                     }, onBlur: function () { return validateLetter(Letter); }, required: true, "aria-describedby": letterError ? 'letter-error' : undefined }),
-                letterError && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "letter-error", role: "alert", "data-testid": "letter-error", style: { color: 'red', minHeight: 18 } }, letterError)),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "letter-error", role: "alert", "data-testid": "letter-error", style: { color: 'red', minHeight: 18 } }, letterError ? letterError : ''),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement("br", null),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_10__.DialogFooter, null,
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: editingItem ? 'Update' : 'Submit', type: 'submit', disabled: disabled }),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: "Cancel", onClick: function () { setShowForm(false); setEditingItem(null); } })))),
-        successMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "success-message", style: { color: 'green', margin: '12px 0' } }, successMessage)),
-        errorMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "error-message", style: { color: 'red', margin: '12px 0' } }, errorMessage)),
+        !showForm && successMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "success-message", style: { color: 'green', margin: '12px 0' } }, successMessage)),
+        !showForm && errorMessage && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { role: "alert", "data-testid": "error-message", style: { color: 'red', margin: '12px 0' } }, errorMessage)),
         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_6__.Dialog, { hidden: !showDeleteDialog, onDismiss: cancelDelete, dialogContentProps: {
                 type: _fluentui_react_lib_Dialog__WEBPACK_IMPORTED_MODULE_7__.DialogType.normal,
                 title: 'Delete FAQ Item',
@@ -349,12 +349,8 @@ var InsertDataWebPart = function (props) {
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } }, item.body),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } }, item.Letter),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } },
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", "aria-label": "Edit", "data-testid": "edit-button-".concat(item.Id), onClick: function () { return handleEdit(item); }, style: { marginRight: 8 } },
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { role: "img", "aria-label": "Edit", style: { marginRight: 4 } }, "\u270F\uFE0F"),
-                            "Edit"),
-                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", "aria-label": "Delete", "data-testid": "delete-button-".concat(item.Id), onClick: function () { return handleDelete({ Id: item.Id, Title: item.Title }); } },
-                            react__WEBPACK_IMPORTED_MODULE_0__.createElement("span", { role: "img", "aria-label": "Delete", style: { marginRight: 4 } }, "\uD83D\uDDD1\uFE0F"),
-                            "Delete")))); }),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", "aria-label": "Edit", "data-testid": "edit-button-".concat(item.Id), onClick: function () { return handleEdit(item); }, style: { marginRight: 8 } }, "Edit"),
+                        react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", "aria-label": "Delete", "data-testid": "delete-button-".concat(item.Id), onClick: function () { return handleDelete({ Id: item.Id, Title: item.Title }); } }, "Delete")))); }),
                 faqItems.length === 0 && (react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", null,
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { colSpan: 4, style: { textAlign: 'center', color: '#888' } }, "No FAQ items found.")))))));
 };
