@@ -91,20 +91,15 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
     fetchOptions();
   }, []);
 
-  // Fetch all FAQ items from SharePoint
+  // Fetch all FAQ items from SharePoint using 'Body' (capital B)
   const fetchFaqItems = React.useCallback(async () => {
     try {
       const list = sp.web.lists.getByTitle('FAQ');
-      // Fetch 'body' (internal name), map to Description for UI
-      const items = await list.items
-        .select('Id', 'Title', 'body', 'Letter')
-        .orderBy('Id', false)
-        .get();
-      // Map 'body' to Description for UI
+      const items = await list.items.select('Id', 'Title', 'Body', 'Letter').orderBy('Id', false).get();
       setFaqItems(items.map((item: any) => ({
         Id: item.Id,
         Title: item.Title,
-        Description: item.body, // map 'body' to Description
+        Description: item.Body, // map 'Body' to Description
         Letter: item.Letter
       })));
     } catch {
@@ -128,10 +123,9 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
     }
     try {
       if (editingItem) {
-        // Update existing item, map Description to 'body'
         await sp.web.lists.getByTitle('FAQ').items.getById(editingItem.Id).update({
           Title,
-          body: Description, // use 'body' for SharePoint
+          Body: Description,
           Letter
         });
         setSuccessMessage('Item updated successfully');
@@ -145,10 +139,9 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           setShowForm(false); // Close dialog after update
         }, 3000);
       } else {
-        // Add new item, map Description to 'body'
         await sp.web.lists.getByTitle('FAQ').items.add({
           Title,
-          body: Description, // use 'body' for SharePoint
+          Body: Description,
           Letter
         });
         setSuccessMessage('Item created successfully');
@@ -156,7 +149,6 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
         setTitle('');
         setDescription('');
         setLetter('');
-        // Dialog stays open on create (do not close)
         setTimeout(() => {
           setSuccessMessage(null);
         }, 3000);

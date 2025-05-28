@@ -155,7 +155,7 @@ var InsertDataWebPart = function (props) {
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         fetchOptions();
     }, []);
-    // Fetch all FAQ items from SharePoint
+    // Fetch all FAQ items from SharePoint using 'Body' (capital B)
     var fetchFaqItems = react__WEBPACK_IMPORTED_MODULE_0__.useCallback(function () { return __awaiter(void 0, void 0, void 0, function () {
         var list, items, _a;
         return __generator(this, function (_b) {
@@ -163,17 +163,13 @@ var InsertDataWebPart = function (props) {
                 case 0:
                     _b.trys.push([0, 2, , 3]);
                     list = _pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1__.sp.web.lists.getByTitle('FAQ');
-                    return [4 /*yield*/, list.items
-                            .select('Id', 'Title', 'body', 'Letter')
-                            .orderBy('Id', false)
-                            .get()];
+                    return [4 /*yield*/, list.items.select('Id', 'Title', 'Body', 'Letter').orderBy('Id', false).get()];
                 case 1:
                     items = _b.sent();
-                    // Map 'body' to Description for UI
                     setFaqItems(items.map(function (item) { return ({
                         Id: item.Id,
                         Title: item.Title,
-                        Description: item.body, // map 'body' to Description
+                        Description: item.Body, // map 'Body' to Description
                         Letter: item.Letter
                     }); }));
                     return [3 /*break*/, 3];
@@ -206,14 +202,12 @@ var InsertDataWebPart = function (props) {
                 case 1:
                     _a.trys.push([1, 6, , 7]);
                     if (!editingItem) return [3 /*break*/, 3];
-                    // Update existing item, map Description to 'body'
                     return [4 /*yield*/, _pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1__.sp.web.lists.getByTitle('FAQ').items.getById(editingItem.Id).update({
                             Title: Title,
-                            body: Description, // use 'body' for SharePoint
+                            Body: Description,
                             Letter: Letter
                         })];
                 case 2:
-                    // Update existing item, map Description to 'body'
                     _a.sent();
                     setSuccessMessage('Item updated successfully');
                     setErrorMessage(null);
@@ -226,22 +220,18 @@ var InsertDataWebPart = function (props) {
                         setShowForm(false); // Close dialog after update
                     }, 3000);
                     return [3 /*break*/, 5];
-                case 3: 
-                // Add new item, map Description to 'body'
-                return [4 /*yield*/, _pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1__.sp.web.lists.getByTitle('FAQ').items.add({
+                case 3: return [4 /*yield*/, _pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1__.sp.web.lists.getByTitle('FAQ').items.add({
                         Title: Title,
-                        body: Description, // use 'body' for SharePoint
+                        Body: Description,
                         Letter: Letter
                     })];
                 case 4:
-                    // Add new item, map Description to 'body'
                     _a.sent();
                     setSuccessMessage('Item created successfully');
                     setErrorMessage(null);
                     setTitle('');
                     setDescription('');
                     setLetter('');
-                    // Dialog stays open on create (do not close)
                     setTimeout(function () {
                         setSuccessMessage(null);
                     }, 3000);
