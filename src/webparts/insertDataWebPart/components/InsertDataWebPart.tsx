@@ -10,7 +10,7 @@ import '@pnp/sp/items';
 const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
 
   const [Title, setTitle] = React.useState('');
-  const [Body, setBody] = React.useState('');
+  const [Description, setDescription] = React.useState('');
   const [Letter, setLetter] = React.useState('');
   // These are the choices for the dropdown
   const [options, setOptions] = React.useState<IDropdownOption[]>([]);
@@ -19,15 +19,15 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   const [errorMessage, setErrorMessage] = React.useState<string | null>(null);
   // These keep track of mistakes in the form
   const [titleError, setTitleError] = React.useState<string | undefined>();
-  const [bodyError, setBodyError] = React.useState<string | undefined>();
+  const [descriptionError, setDescriptionError] = React.useState<string | undefined>();
   const [letterError, setLetterError] = React.useState<string | undefined>();
 
   const [disabled, setDisabled] = React.useState(true);
   const [showForm, setShowForm] = React.useState(false);
 
   // FAQ list state
-  const [faqItems, setFaqItems] = React.useState<{ Id: number; Title: string; body: string; Letter: string }[]>([]);
-  const [editingItem, setEditingItem] = React.useState<{ Id: number; Title: string; body: string; Letter: string } | null>(null);
+  const [faqItems, setFaqItems] = React.useState<{ Id: number; Title: string; Description: string; Letter: string }[]>([]);
+  const [editingItem, setEditingItem] = React.useState<{ Id: number; Title: string; Description: string; Letter: string } | null>(null);
   const [deletingItem, setDeletingItem] = React.useState<{ Id: number; Title: string } | null>(null);
   const [showDeleteDialog, setShowDeleteDialog] = React.useState(false);
 
@@ -39,12 +39,12 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
     setTitleError(undefined);
     return true;
   };
-  const validateBody = (value?: string): boolean => {
+  const validateDescription = (value?: string): boolean => {
     if (!value || value.trim() === '') {
-      setBodyError('Body is required');
+      setDescriptionError('Description is required');
       return false;
     }
-    setBodyError(undefined);
+    setDescriptionError(undefined);
     return true;
   };
   const validateLetter = (value?: string): boolean => {
@@ -58,9 +58,9 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
 
   React.useEffect(() => {
     setDisabled(
-      !Title || !Body || !Letter || !!titleError || !!bodyError || !!letterError
+      !Title || !Description || !Letter || !!titleError || !!descriptionError || !!letterError
     );
-  }, [Title, Body, Letter, titleError, bodyError, letterError]);
+  }, [Title, Description, Letter, titleError, descriptionError, letterError]);
 
   // Tell PnPjs how to talk to SharePoint
   React.useEffect(() => {
@@ -95,11 +95,18 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   const fetchFaqItems = React.useCallback(async () => {
     try {
       const list = sp.web.lists.getByTitle('FAQ');
+      // Fetch 'body' (internal name), map to Description for UI
       const items = await list.items
         .select('Id', 'Title', 'body', 'Letter')
         .orderBy('Id', false)
         .get();
-      setFaqItems(items);
+      // Map 'body' to Description for UI
+      setFaqItems(items.map((item: any) => ({
+        Id: item.Id,
+        Title: item.Title,
+        Description: item.body, // map 'body' to Description
+        Letter: item.Letter
+      })));
     } catch {
       setFaqItems([]);
     }
@@ -114,23 +121,23 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault();
     const isTitleValid = validateTitle(Title);
-    const isBodyValid = validateBody(Body);
+    const isDescriptionValid = validateDescription(Description);
     const isLetterValid = validateLetter(Letter);
-    if (!isTitleValid || !isBodyValid || !isLetterValid) {
+    if (!isTitleValid || !isDescriptionValid || !isLetterValid) {
       return;
     }
     try {
       if (editingItem) {
-        // Update existing item
+        // Update existing item, map Description to 'body'
         await sp.web.lists.getByTitle('FAQ').items.getById(editingItem.Id).update({
           Title,
-          body: Body,
+          body: Description, // use 'body' for SharePoint
           Letter
         });
         setSuccessMessage('Item updated successfully');
         setErrorMessage(null);
         setTitle('');
-        setBody('');
+        setDescription('');
         setLetter('');
         setEditingItem(null);
         setTimeout(() => {
@@ -138,16 +145,16 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           setShowForm(false); // Close dialog after update
         }, 3000);
       } else {
-        // Add new item
+        // Add new item, map Description to 'body'
         await sp.web.lists.getByTitle('FAQ').items.add({
           Title,
-          body: Body,
+          body: Description, // use 'body' for SharePoint
           Letter
         });
         setSuccessMessage('Item created successfully');
         setErrorMessage(null);
         setTitle('');
-        setBody('');
+        setDescription('');
         setLetter('');
         // Dialog stays open on create (do not close)
         setTimeout(() => {
@@ -161,9 +168,9 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
   };
 
   // When Edit is clicked, fill the form with the item's values
-  const handleEdit = (item: { Id: number; Title: string; body: string; Letter: string }): void => {
+  const handleEdit = (item: { Id: number; Title: string; Description: string; Letter: string }): void => {
     setTitle(item.Title);
-    setBody(item.body);
+    setDescription(item.Description); // Description is already mapped from 'body'
     setLetter(item.Letter);
     setEditingItem(item);
     setShowForm(true);
@@ -208,10 +215,10 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
     <div>
       <PrimaryButton text="Create Item" onClick={() => {
         setTitle('');
-        setBody('');
+        setDescription('');
         setLetter('');
         setTitleError(undefined);
-        setBodyError(undefined);
+        setDescriptionError(undefined);
         setLetterError(undefined);
         setEditingItem(null);
         setShowForm(true);
@@ -274,21 +281,20 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
             {titleError ? titleError : ''}
           </div>
           <TextField 
-            label='Body' 
-            id='Body' 
-            value={Body} 
+            label='Description' 
+            id='Description' 
+            value={Description} 
             onChange={(event, v) => {
-              setBody(v || '');
-              validateBody(v);
+              setDescription(v || '');
+              validateDescription(v);
             }} 
-            onBlur={() => validateBody(Body)}
+            onBlur={() => validateDescription(Description)}
             multiline
             required
-            aria-describedby={bodyError ? 'body-error' : undefined}
+            aria-describedby={descriptionError ? 'description-error' : undefined}
           />
-          {/* Only render error if present */}
-          <div id="body-error" role="alert" data-testid="body-error" style={{ color: 'red', minHeight: 18 }}>
-            {bodyError ? bodyError : ''}
+          <div id="description-error" role="alert" data-testid="description-error" style={{ color: 'red', minHeight: 18 }}>
+            {descriptionError ? descriptionError : ''}
           </div>
           <Dropdown 
             label="Letter" 
@@ -336,7 +342,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
         <thead>
           <tr>
             <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>Title</th>
-            <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>Body</th>
+            <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>Description</th>
             <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>Letter</th>
             <th style={{ borderBottom: '1px solid #ccc', textAlign: 'left' }}>Action</th>
           </tr>
@@ -345,7 +351,7 @@ const InsertDataWebPart: React.FC<IInsertDataWebPartProps> = (props) => {
           {faqItems.map(item => (
             <tr key={item.Id}>
               <td style={{ borderBottom: '1px solid #eee' }}>{item.Title}</td>
-              <td style={{ borderBottom: '1px solid #eee' }}>{item.body}</td>
+              <td style={{ borderBottom: '1px solid #eee' }}>{item.Description}</td>
               <td style={{ borderBottom: '1px solid #eee' }}>{item.Letter}</td>
               <td style={{ borderBottom: '1px solid #eee' }}>
                 <button

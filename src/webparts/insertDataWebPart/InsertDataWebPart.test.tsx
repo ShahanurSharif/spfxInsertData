@@ -45,10 +45,10 @@ describe('InsertDataWebPart', () => {
     const titleInput = screen.getByLabelText('Title');
     titleInput.focus();
     titleInput.blur();
-    // Focus and blur Body
-    const bodyInput = screen.getByLabelText('Body');
-    bodyInput.focus();
-    bodyInput.blur();
+    // Focus and blur Description
+    const descriptionInput = screen.getByLabelText('Description');
+    descriptionInput.focus();
+    descriptionInput.blur();
     // Focus and blur Letter (dropdown)
     const letterDropdown = screen.getByLabelText('Letter');
     letterDropdown.focus();
@@ -56,7 +56,7 @@ describe('InsertDataWebPart', () => {
     // Fluent UI renders errors as aria-live messages, so query by role alert
     const alerts = await screen.findAllByRole('alert');
     expect(alerts.some(a => a.textContent?.match(/Title is required/i))).toBe(true);
-    expect(alerts.some(a => a.textContent?.match(/Body is required/i))).toBe(true);
+    expect(alerts.some(a => a.textContent?.match(/Description is required/i))).toBe(true);
     expect(alerts.some(a => a.textContent?.match(/Letter is required/i))).toBe(true);
   });
 
@@ -83,19 +83,18 @@ describe('InsertDataWebPart', () => {
       .mockImplementationOnce(() =>
         Promise.resolve({
           ok: true,
-          json: () => Promise.resolve({ value: [{ Id: 1, Title: fakeTitle, body: fakeTitle, Letter: 'A' }] })
+          json: () => Promise.resolve({ value: [{ Id: 1, Title: fakeTitle, Body: fakeTitle, Letter: 'A' }] })
         })
       );
     render(<InsertDataWebPart {...mockProps}/>);
     userEvent.click(screen.getByText('Create Item'));
     userEvent.type(screen.getByLabelText('Title'), fakeTitle);
-    userEvent.type(screen.getByLabelText('Body'), fakeTitle);
+    userEvent.type(screen.getByLabelText('Description'), fakeTitle);
     await selectDropdownOption('Letter', 'A');
     userEvent.click(screen.getByText('Submit'));
     // Wait for the MessageBar to appear, then check for the success message
     // const messageBar = await screen.findByTestId('success-message', {}, { timeout: 5000 });
     // expect(messageBar).toBeInTheDocument();
-    // expect(within(messageBar).getByText(/item created successfully/i)).toBeInTheDocument();
     expect(screen.getByText(fakeTitle)).toBeInTheDocument();
     expect(screen.getByText('A')).toBeInTheDocument(); 
   });
@@ -104,8 +103,10 @@ describe('InsertDataWebPart', () => {
     render(<InsertDataWebPart {...mockProps} />);
     userEvent.click(screen.getByText('Create Item'));
     userEvent.type(screen.getByLabelText('Title'), 'Test Title');
-    userEvent.type(screen.getByLabelText('Body'), 'Test Body');
+    userEvent.type(screen.getByLabelText('Description'), 'Test Description');
     await selectDropdownOption('Letter', 'A');
+    // Simulate failed POST
+    window.fetch = jest.fn(() => Promise.resolve({ ok: false })) as jest.Mock;
     userEvent.click(screen.getByText('Submit'));
     expect(await screen.findByText('Error creating item')).toBeInTheDocument();
   });
@@ -115,43 +116,25 @@ describe('InsertDataWebPart', () => {
     window.fetch = jest.fn(() => 
       Promise.resolve({
         ok: true,
-        json: () => Promise.resolve({ Id: 1, Title: 'Test Title', Body: 'Test Body', Letter: 'A' })
+        json: () => Promise.resolve({ Id: 1, Title: 'Test Title', Body: 'Test Description', Letter: 'A' })
       })
     ) as jest.Mock;
-    
     render(<InsertDataWebPart {...mockProps} />);
     userEvent.click(screen.getByText('Create Item'));
-    const fakeTitle = faker.lorem.sentence();
-    userEvent.type(screen.getByLabelText('Title'), fakeTitle);
-    userEvent.type(screen.getByLabelText('Body'), fakeTitle);
+    userEvent.type(screen.getByLabelText('Title'), 'Test Title');
+    userEvent.type(screen.getByLabelText('Description'), 'Test Description');
     await selectDropdownOption('Letter', 'A');
     userEvent.click(screen.getByText('Submit'));
-    userEvent.click(screen.getByText('Close'));
-    
-    // Wait for the form dialog to close and the item to appear in the list
-    await screen.findByText(fakeTitle);
-
-    // Find the item row by its title
-
-    const itemRow = await screen.findByText(fakeTitle);
-    expect(itemRow).toBeInTheDocument();
-
-    const row = itemRow.closest('tr');
-    // Use querySelector to find the edit button by data-testid prefix
-    const editButton = row && row.querySelector('[data-testid^="edit-button-"]');
-    expect(editButton).not.toBeNull();
+    // Find the edit button by data-testid pattern
+    const editButton = await screen.findByTestId(/^edit-button-\d+$/);
+    expect(editButton).toBeInTheDocument();
     // userEvent.click requires a non-null Element, so cast is safe after the check
     userEvent.click(editButton as HTMLElement);
-    
-    // Perform the edit
-    // const newFakeTitle = faker.lorem.sentence();
-    // const titleInput = await screen.findByLabelText('Title');
-    // userEvent.clear(titleInput);
-    // userEvent.type(titleInput, newFakeTitle);
-    // userEvent.click(screen.getByText('Update'));
-
-    // // Verify the updated item appears
-    // expect(await screen.findByText(newFakeTitle)).toBeInTheDocument();
+    // Perform the edit (simulate update)
+    userEvent.type(screen.getByLabelText('Title'), ' Updated');
+    userEvent.click(screen.getByText('Update'));
+    // Verify the updated item appears
+    expect(await screen.findByText('Test Title Updated')).toBeInTheDocument();
   });
 
   it('deletes an item successfully', async () => {
@@ -159,10 +142,11 @@ describe('InsertDataWebPart', () => {
     userEvent.click(screen.getByText('Create Item'));
     const fakeTitle = faker.lorem.sentence();
     userEvent.type(screen.getByLabelText('Title'), fakeTitle);
-    userEvent.type(screen.getByLabelText('Body'), faker.lorem.paragraph());
+    userEvent.type(screen.getByLabelText('Description'), faker.lorem.paragraph());
     await selectDropdownOption('Letter', 'A');
     userEvent.click(screen.getByText('Submit'));
-    // Wait for the dialog to close and the item to appear in the list
+    userEvent.click(screen.getByText('Close'));
+    // Wait for the form dialog to close and the item to appear in the list
     await screen.findByText(fakeTitle);
     // Now delete the item
     userEvent.click(screen.getByText('Delete'));
@@ -174,7 +158,7 @@ describe('InsertDataWebPart', () => {
     render(<InsertDataWebPart {...mockProps} />);
     userEvent.click(screen.getByText('Create Item'));
     userEvent.type(screen.getByLabelText('Title'), 'Test Title');
-    userEvent.type(screen.getByLabelText('Body'), 'Test Body');
+    userEvent.type(screen.getByLabelText('Description'), 'Test Description');
     await selectDropdownOption('Letter', 'A');
     userEvent.click(screen.getByText('Submit'));
     // Now try to delete the item
@@ -183,31 +167,40 @@ describe('InsertDataWebPart', () => {
   });
 
   it('renders edit and delete buttons with correct data-testid and allows extracting item Id', async () => {
-  render(<InsertDataWebPart {...mockProps} />);
-  userEvent.click(screen.getByText('Create Item'));
-  const fakeTitle = faker.lorem.sentence();
-  userEvent.type(screen.getByLabelText('Title'), fakeTitle);
-  userEvent.type(screen.getByLabelText('Body'), 'Test body');
-  await selectDropdownOption('Letter', 'A');
-  userEvent.click(screen.getByText('Submit'));
-
-  // Find the edit button by data-testid pattern
-  const editButton = await screen.findByTestId(/^edit-button-\d+$/);
-  expect(editButton).toBeInTheDocument();
-
-  // Extract the item Id from the data-testid attribute
-  const dataTestId = editButton.getAttribute('data-testid');
-  expect(dataTestId).toMatch(/^edit-button-\d+$/);
-  const idMatch = dataTestId?.match(/^edit-button-(\d+)$/);
-  expect(idMatch).not.toBeNull();
-  const itemId = idMatch ? Number(idMatch[1]) : null;
-  expect(typeof itemId).toBe('number');
-  expect(itemId).toBeGreaterThan(0);
-
-  // The delete button should have the same Id
-  const deleteButton = screen.getByTestId(`delete-button-${itemId}`);
-  expect(deleteButton).toBeInTheDocument();
-});
+    render(<InsertDataWebPart {...mockProps} />);
+    userEvent.click(screen.getByText('Create Item'));
+    const fakeTitle = faker.lorem.sentence();
+    userEvent.type(screen.getByLabelText('Title'), fakeTitle);
+    userEvent.type(screen.getByLabelText('Description'), fakeTitle);
+    await selectDropdownOption('Letter', 'A');
+    userEvent.click(screen.getByText('Submit'));
+    userEvent.click(screen.getByText('Close'));
+    // Wait for the form dialog to close and the item to appear in the list
+    await screen.findByText(fakeTitle);
+    // Find the item row by its title
+    const itemRow = await screen.findByText(fakeTitle);
+    expect(itemRow).toBeInTheDocument();
+    const row = itemRow.closest('tr');
+    // Use querySelector to find the edit button by data-testid prefix
+    const editButton = row && row.querySelector('[data-testid^="edit-button-"]');
+    expect(editButton).not.toBeNull();
+    // userEvent.click requires a non-null Element, so cast is safe after the check
+    userEvent.click(editButton as HTMLElement);
+    // Find the edit button by data-testid pattern
+    const editButtonPattern = await screen.findByTestId(/^edit-button-\d+$/);
+    expect(editButtonPattern).toBeInTheDocument();
+    // Extract the item Id from the data-testid attribute
+    const dataTestId = editButtonPattern.getAttribute('data-testid');
+    expect(dataTestId).toMatch(/^edit-button-\d+$/);
+    const idMatch = dataTestId?.match(/^edit-button-(\d+)$/);
+    expect(idMatch).not.toBeNull();
+    const itemId = idMatch ? Number(idMatch[1]) : null;
+    expect(typeof itemId).toBe('number');
+    expect(itemId).toBeGreaterThan(0);
+    // The delete button should have the same Id
+    const deleteButton = screen.getByTestId(`delete-button-${itemId}`);
+    expect(deleteButton).toBeInTheDocument();
+  });
 
 });
 

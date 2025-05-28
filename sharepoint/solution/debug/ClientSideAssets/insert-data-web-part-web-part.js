@@ -72,7 +72,7 @@ var __generator = (undefined && undefined.__generator) || function (thisArg, bod
 
 var InsertDataWebPart = function (props) {
     var _a = react__WEBPACK_IMPORTED_MODULE_0__.useState(''), Title = _a[0], setTitle = _a[1];
-    var _b = react__WEBPACK_IMPORTED_MODULE_0__.useState(''), Description = _b[0], setDescription = _b[1];
+    var _b = react__WEBPACK_IMPORTED_MODULE_0__.useState(''), Body = _b[0], setBody = _b[1];
     var _c = react__WEBPACK_IMPORTED_MODULE_0__.useState(''), Letter = _c[0], setLetter = _c[1];
     // These are the choices for the dropdown
     var _d = react__WEBPACK_IMPORTED_MODULE_0__.useState([]), options = _d[0], setOptions = _d[1];
@@ -81,7 +81,7 @@ var InsertDataWebPart = function (props) {
     var _f = react__WEBPACK_IMPORTED_MODULE_0__.useState(null), errorMessage = _f[0], setErrorMessage = _f[1];
     // These keep track of mistakes in the form
     var _g = react__WEBPACK_IMPORTED_MODULE_0__.useState(), titleError = _g[0], setTitleError = _g[1];
-    var _h = react__WEBPACK_IMPORTED_MODULE_0__.useState(), descriptionError = _h[0], setDescriptionError = _h[1];
+    var _h = react__WEBPACK_IMPORTED_MODULE_0__.useState(), bodyError = _h[0], setBodyError = _h[1];
     var _j = react__WEBPACK_IMPORTED_MODULE_0__.useState(), letterError = _j[0], setLetterError = _j[1];
     var _k = react__WEBPACK_IMPORTED_MODULE_0__.useState(true), disabled = _k[0], setDisabled = _k[1];
     var _l = react__WEBPACK_IMPORTED_MODULE_0__.useState(false), showForm = _l[0], setShowForm = _l[1];
@@ -98,12 +98,12 @@ var InsertDataWebPart = function (props) {
         setTitleError(undefined);
         return true;
     };
-    var validateDescription = function (value) {
+    var validateBody = function (value) {
         if (!value || value.trim() === '') {
-            setDescriptionError('Description is required');
+            setBodyError('Body is required');
             return false;
         }
-        setDescriptionError(undefined);
+        setBodyError(undefined);
         return true;
     };
     var validateLetter = function (value) {
@@ -115,8 +115,8 @@ var InsertDataWebPart = function (props) {
         return true;
     };
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
-        setDisabled(!Title || !Description || !Letter || !!titleError || !!descriptionError || !!letterError);
-    }, [Title, Description, Letter, titleError, descriptionError, letterError]);
+        setDisabled(!Title || !Body || !Letter || !!titleError || !!bodyError || !!letterError);
+    }, [Title, Body, Letter, titleError, bodyError, letterError]);
     // Tell PnPjs how to talk to SharePoint
     react__WEBPACK_IMPORTED_MODULE_0__.useEffect(function () {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -169,13 +169,7 @@ var InsertDataWebPart = function (props) {
                             .get()];
                 case 1:
                     items = _b.sent();
-                    // Map 'body' to Description for UI
-                    setFaqItems(items.map(function (item) { return ({
-                        Id: item.Id,
-                        Title: item.Title,
-                        Description: item.body, // map 'body' to Description
-                        Letter: item.Letter
-                    }); }));
+                    setFaqItems(items);
                     return [3 /*break*/, 3];
                 case 2:
                     _a = _b.sent();
@@ -191,34 +185,34 @@ var InsertDataWebPart = function (props) {
     }, [fetchFaqItems, showForm, successMessage]);
     // When you click the button, try to add or update the item
     var handleSubmit = function (e) { return __awaiter(void 0, void 0, void 0, function () {
-        var isTitleValid, isDescriptionValid, isLetterValid, error_1;
+        var isTitleValid, isBodyValid, isLetterValid, error_1;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
                     e.preventDefault();
                     isTitleValid = validateTitle(Title);
-                    isDescriptionValid = validateDescription(Description);
+                    isBodyValid = validateBody(Body);
                     isLetterValid = validateLetter(Letter);
-                    if (!isTitleValid || !isDescriptionValid || !isLetterValid) {
+                    if (!isTitleValid || !isBodyValid || !isLetterValid) {
                         return [2 /*return*/];
                     }
                     _a.label = 1;
                 case 1:
                     _a.trys.push([1, 6, , 7]);
                     if (!editingItem) return [3 /*break*/, 3];
-                    // Update existing item, map Description to 'body'
+                    // Update existing item
                     return [4 /*yield*/, _pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1__.sp.web.lists.getByTitle('FAQ').items.getById(editingItem.Id).update({
                             Title: Title,
-                            body: Description, // use 'body' for SharePoint
+                            body: Body,
                             Letter: Letter
                         })];
                 case 2:
-                    // Update existing item, map Description to 'body'
+                    // Update existing item
                     _a.sent();
                     setSuccessMessage('Item updated successfully');
                     setErrorMessage(null);
                     setTitle('');
-                    setDescription('');
+                    setBody('');
                     setLetter('');
                     setEditingItem(null);
                     setTimeout(function () {
@@ -227,19 +221,19 @@ var InsertDataWebPart = function (props) {
                     }, 3000);
                     return [3 /*break*/, 5];
                 case 3: 
-                // Add new item, map Description to 'body'
+                // Add new item
                 return [4 /*yield*/, _pnp_sp_commonjs__WEBPACK_IMPORTED_MODULE_1__.sp.web.lists.getByTitle('FAQ').items.add({
                         Title: Title,
-                        body: Description, // use 'body' for SharePoint
+                        body: Body,
                         Letter: Letter
                     })];
                 case 4:
-                    // Add new item, map Description to 'body'
+                    // Add new item
                     _a.sent();
                     setSuccessMessage('Item created successfully');
                     setErrorMessage(null);
                     setTitle('');
-                    setDescription('');
+                    setBody('');
                     setLetter('');
                     // Dialog stays open on create (do not close)
                     setTimeout(function () {
@@ -259,7 +253,7 @@ var InsertDataWebPart = function (props) {
     // When Edit is clicked, fill the form with the item's values
     var handleEdit = function (item) {
         setTitle(item.Title);
-        setDescription(item.Description); // Description is already mapped from 'body'
+        setBody(item.body);
         setLetter(item.Letter);
         setEditingItem(item);
         setShowForm(true);
@@ -312,10 +306,10 @@ var InsertDataWebPart = function (props) {
     return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", null,
         react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_5__.PrimaryButton, { text: "Create Item", onClick: function () {
                 setTitle('');
-                setDescription('');
+                setBody('');
                 setLetter('');
                 setTitleError(undefined);
-                setDescriptionError(undefined);
+                setBodyError(undefined);
                 setLetterError(undefined);
                 setEditingItem(null);
                 setShowForm(true);
@@ -333,11 +327,11 @@ var InsertDataWebPart = function (props) {
                         validateTitle(v);
                     }, onBlur: function () { return validateTitle(Title); }, required: true, "aria-describedby": titleError ? 'title-error' : undefined }),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "title-error", role: "alert", "data-testid": "title-error", style: { color: 'red', minHeight: 18 } }, titleError ? titleError : ''),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_10__.TextField, { label: 'Description', id: 'Description', value: Description, onChange: function (event, v) {
-                        setDescription(v || '');
-                        validateDescription(v);
-                    }, onBlur: function () { return validateDescription(Description); }, multiline: true, required: true, "aria-describedby": descriptionError ? 'description-error' : undefined }),
-                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "description-error", role: "alert", "data-testid": "description-error", style: { color: 'red', minHeight: 18 } }, descriptionError ? descriptionError : ''),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_10__.TextField, { label: 'Body', id: 'Body', value: Body, onChange: function (event, v) {
+                        setBody(v || '');
+                        validateBody(v);
+                    }, onBlur: function () { return validateBody(Body); }, multiline: true, required: true, "aria-describedby": bodyError ? 'body-error' : undefined }),
+                react__WEBPACK_IMPORTED_MODULE_0__.createElement("div", { id: "body-error", role: "alert", "data-testid": "body-error", style: { color: 'red', minHeight: 18 } }, bodyError ? bodyError : ''),
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement(_fluentui_react__WEBPACK_IMPORTED_MODULE_11__.Dropdown, { label: "Letter", id: "Letter", options: options, selectedKey: Letter, onChange: function (event, option) {
                         setLetter(option ? String(option.key) : '');
                         validateLetter(option ? String(option.key) : '');
@@ -360,13 +354,13 @@ var InsertDataWebPart = function (props) {
             react__WEBPACK_IMPORTED_MODULE_0__.createElement("thead", null,
                 react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", null,
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("th", { style: { borderBottom: '1px solid #ccc', textAlign: 'left' } }, "Title"),
-                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("th", { style: { borderBottom: '1px solid #ccc', textAlign: 'left' } }, "Description"),
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("th", { style: { borderBottom: '1px solid #ccc', textAlign: 'left' } }, "Body"),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("th", { style: { borderBottom: '1px solid #ccc', textAlign: 'left' } }, "Letter"),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("th", { style: { borderBottom: '1px solid #ccc', textAlign: 'left' } }, "Action"))),
             react__WEBPACK_IMPORTED_MODULE_0__.createElement("tbody", null,
                 faqItems.map(function (item) { return (react__WEBPACK_IMPORTED_MODULE_0__.createElement("tr", { key: item.Id },
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } }, item.Title),
-                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } }, item.Description),
+                    react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } }, item.body),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } }, item.Letter),
                     react__WEBPACK_IMPORTED_MODULE_0__.createElement("td", { style: { borderBottom: '1px solid #eee' } },
                         react__WEBPACK_IMPORTED_MODULE_0__.createElement("button", { type: "button", "aria-label": "Edit", "data-testid": "edit-button-".concat(item.Id), onClick: function () { return handleEdit(item); }, style: { marginRight: 8 } }, "Edit"),
