@@ -38,7 +38,7 @@
     "scriptResources": {
       "insert-data-web-part-web-part": {
         "type": "path",
-        "path": "insert-data-web-part-web-part.js"
+        "path": "insert-data-web-part-web-part_440e5daea1da8895e969.js"
       },
       "react": {
         "type": "component",
@@ -67,7 +67,7 @@
       },
       "InsertDataWebPartWebPartStrings": {
         "type": "path",
-        "path": "InsertDataWebPartWebPartStrings_en-us.js"
+        "path": "InsertDataWebPartWebPartStrings_en-us_eb42a517954fea904e022e89eb9f35e4.js"
       }
     }
   }
